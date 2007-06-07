@@ -1,0 +1,85 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>1</title>
+</head>
+
+<body bgcolor="#99CCFF">
+
+<table border="1" width="100%">
+  <tr>
+    <td width="100%"><b><font size="6" color="#0000FF">ICTCLAS4J中文分词系统使用说明</font></b></td>
+  </tr>
+  <tr>
+    <td width="100%">
+      <p style="line-height: 200%"><font size="4">1.ictclas4j是在中科院开源分词系统<a href="http://www.i3s.ac.cn">FreeICTCLAS</a>的基础上重新实现和改进而来<br>
+      2.任何人不得将此用于商业用途，仅限个人学习研究之用<br>
+      3.该分词程序的最终解释权张新波（sinboy）和中科院张华平所有<br>
+      4.对使用中遇到的问题，请到<a href="http://groups.google.com/group/ictclas">ictclas论坛组</a>内交流<br>
+      5.也可直接Email给我：sinboy@126.com</font></td>
+  </tr>
+</table>
+
+<p></p>
+<table border="1" width="100%">
+  <tr>
+    <td width="100%"><b><font size="6" color="#0000FF">ICTCLAS4J大事记&nbsp; </font></b>2007-06-04</td>
+  </tr>
+  <tr>
+    <td width="100%">
+      <div>
+        <p style="line-height: 200%">&nbsp;&nbsp;&nbsp;&nbsp; FreeICTCLAS中文分词系统从2006年3月就开始接触<WBR>
+        ，之后通过研读相关论文和源代码，写了一系列的学习笔记<WBR>
+        ，给很多同样的中文分词爱好者提供了一个可参考的文档资料<WBR>
+        。但因为工作及其它原因（嘿嘿，说白就了就是比较偷懒<WBR>
+        ，没有坚持下去），把该项目做成一个java版的原始想法一度中断<WBR>
+        。之后，也曾多次尝试重新拾起，完成我的一个心愿<WBR>
+        ，但复杂的工作都让我半途而费。
+      </div>
+      <div>
+        <p style="line-height: 200%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4月份的时候，一个爱好才MSN上问我相关问题<WBR>
+        ，又激起了我的原始想法，同时看到吕震宇老师只用了半个月的时间就<WBR>
+        完成了C＃版本的工作，并且写了完成的系列文章，又大大刺激我的神<WBR>
+        经。想想我的系列文章只到半道，ictclas4j的程序也是半拉<WBR>
+        子工程，真是惭愧之极。于是下定决定，一定要把这个项目完成<WBR>
+        ，给自己也给关心ictclas的朋友一个交待。
+      </div>
+      <div>
+        <p style="line-height: 200%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+        经过三个星期的不懈努力，到现在为止，基本上完整的实现了原Fre<WBR>
+        eICTCLAS所实现的功能。原VC＋＋实现的程序比我想象的更<WBR>
+        复杂，中间涉及大量的临时性的数据结构和大量的全局变量<WBR>
+        ，搞的我非常头大，好几次都有放弃的想法。不过谢天谢地<WBR>
+        ，我这次终于坚持下来了。从java程序的角度从出<WBR>
+        ，我对原来的数据结构做了大量调整和优化，去掉了很多不必要的中间<WBR>
+        变量。经过优化后，在整个分词过后中只用到两个对象：Atom<WBR>
+        、SegNode，原子和分词结点，整个分词过程就是对SegNo<WBR>
+        de的不断调整和改进，最终得到分词结果。
+      </div>
+      <div>
+        <p style="line-height: 200%">&nbsp;&nbsp;&nbsp;&nbsp; 
+        因为到现在为止，我只是做了一些简单的测试，可能还有很多的BUG<WBR>
+        在里面（对标点符号的处理就是一问题），并且分词的速度还远远达不<WBR>
+        到我的要求，程序还有很多改进的地方，所以暂时源代码还不会放上来<WBR>
+        ，但我想最迟一个星期之内，我可以上传到论坛供大家测试。同时<WBR>
+        ，我已在Google Code上申请了ictclas4j的开源项目，期望有兴趣的朋友<WBR>
+        加入进来共同改进。
+      </div>
+      <div>
+        <p style="line-height: 200%">&nbsp;&nbsp;&nbsp;&nbsp; 
+        附近中的文件是ictclas4j程序在分词过程输出的完整分词步<WBR>
+        骤记录，对大家直观理解该分词原是应该是一个有益的帮助<WBR>
+        。这个想法也得益于吕震宇的SharpICTCLAS<WBR>
+        ，在此表示感谢！同时感谢DanceFire的几篇精辟入理的分析<WBR>
+        文章，给了我很大的帮助。
+      </div>
+      <p>　</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
