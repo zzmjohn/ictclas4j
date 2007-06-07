@@ -1,0 +1,5 @@
+1.ictclas4j是在中科院开源分词系统FreeICTCLAS的基础上重新实现和改进而来
+2.任何人不得将此用于商业用途，仅限个人学习研究之用
+3.该分词程序的最终解释权张新波（sinboy）和中科院张华平所有
+4.对使用中遇到的问题，请到ictclas论坛组内交流http://groups.google.com/group/ictclas
+5.也可直接Email给我：iamsinboy@gmail.com
