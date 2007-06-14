@@ -1,0 +1,38 @@
+---------------开始,每隔3分钟测试一次--------------
+Pinging 60.191.49.22 with 32 bytes of data:   --Tue Nov 22 18:34:56 CST 2005
+Reply from 60.191.49.22: bytes=32 time=344ms TTL=114   --Tue Nov 22 18:34:56 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:34:57 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:34:58 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:34:59 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:35:00 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:35:01 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:35:02 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:35:03 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:35:04 CST 2005
+
+*******************结束*****************************
+
+---------------开始,每隔2分钟测试一次--------------
+Pinging 60.191.49.22 with 32 bytes of data:   --Tue Nov 22 18:38:04 CST 2005
+Reply from 60.191.49.22: bytes=32 time=335ms TTL=114   --Tue Nov 22 18:38:05 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:38:06 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:38:07 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:38:08 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:38:09 CST 2005
+Reply from 60.191.49.22: bytes=32 time=343ms TTL=114   --Tue Nov 22 18:38:10 CST 2005
+Reply from 60.191.49.22: bytes=32 time=328ms TTL=114   --Tue Nov 22 18:38:11 CST 2005
+Reply from 60.191.49.22: bytes=32 time=312ms TTL=114   --Tue Nov 22 18:38:12 CST 2005
+Reply from 60.191.49.22: bytes=32 time=281ms TTL=114   --Tue Nov 22 18:38:13 CST 2005
+Reply from 60.191.49.22: bytes=32 time=296ms TTL=114   --Tue Nov 22 18:38:14 CST 2005
+Reply from 60.191.49.22: bytes=32 time=296ms TTL=114   --Tue Nov 22 18:38:15 CST 2005
+Reply from 60.191.49.22: bytes=32 time=312ms TTL=114   --Tue Nov 22 18:38:16 CST 2005
+Reply from 60.191.49.22: bytes=32 time=312ms TTL=114   --Tue Nov 22 18:38:17 CST 2005
+Reply from 60.191.49.22: bytes=32 time=312ms TTL=114   --Tue Nov 22 18:38:18 CST 2005
+Reply from 60.191.49.22: bytes=32 time=328ms TTL=114   --Tue Nov 22 18:38:19 CST 2005
+Reply from 60.191.49.22: bytes=32 time=328ms TTL=114   --Tue Nov 22 18:38:20 CST 2005
+Reply from 60.191.49.22: bytes=32 time=327ms TTL=114   --Tue Nov 22 18:38:21 CST 2005
+Reply from 60.191.49.22: bytes=32 time=328ms TTL=114   --Tue Nov 22 18:38:22 CST 2005
+Reply from 60.191.49.22: bytes=32 time=328ms TTL=114   --Tue Nov 22 18:38:23 CST 2005
+
+*******************结束*****************************
+
