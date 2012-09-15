@@ -3,18 +3,18 @@ package org.ictclas4j.bean;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
- * Ô¤´¦ÀíºóµÄ´ÊÌõ.
+ * é¢„å¤„ç†åçš„è¯æ¡.
  * @author sinboy
  *
  */
 public class Preword {
-	//´Ê
+	//è¯
 	private String word;
 	
-	//È¥µôµÚÒ»¸ö×ÖºóÊ£ÓàµÄ²¿·Ö
+	//å»æ‰ç¬¬ä¸€ä¸ªå­—åå‰©ä½™çš„éƒ¨åˆ†
 	private String res;
 	
-	//´ÊÔÚ´Êµä±íÖĞ³öÏÖµÄÎ»ÖÃ£¬¼´´ÊµÄÊ××ÖÔÚÇøÎ»Âë±íÖĞ¶ÔÓ¦µÄÆ«ÒÆÎ»ÖÃ.±ÈÈç£º°¡£­£­0
+	//è¯åœ¨è¯å…¸è¡¨ä¸­å‡ºç°çš„ä½ç½®ï¼Œå³è¯çš„é¦–å­—åœ¨åŒºä½ç è¡¨ä¸­å¯¹åº”çš„åç§»ä½ç½®.æ¯”å¦‚ï¼šå•Šï¼ï¼0
 	private int index;
 	
 	 

@@ -16,7 +16,7 @@ public class SentenceSeg {
 		sens=split();
 	}
 	/**
-	 * ½øĞĞ¾ä×Ó·Ö¸ô
+	 * è¿›è¡Œå¥å­åˆ†éš”
 	 * 
 	 * @param src
 	 * @return
@@ -30,15 +30,15 @@ public class SentenceSeg {
 			String[] ss = GFString.atomSplit(src);
 
 			for (int i = 0; i < ss.length; i++) {
-				// Èç¹ûÊÇ·Ö¸ô·û£¬±ÈÈç»Ø³µ»»ĞĞ/¶ººÅµÈ
+				// å¦‚æœæ˜¯åˆ†éš”ç¬¦ï¼Œæ¯”å¦‚å›è½¦æ¢è¡Œ/é€—å·ç­‰
 				if (Utility.SEPERATOR_C_SENTENCE.indexOf(ss[i]) != -1
 						|| Utility.SEPERATOR_LINK.indexOf(ss[i]) != -1
 						|| Utility.SEPERATOR_C_SUB_SENTENCE.indexOf(ss[i]) != -1
 						|| Utility.SEPERATOR_E_SUB_SENTENCE.indexOf(ss[i]) != -1) {
-					// Èç¹û²»ÊÇ»Ø³µ»»ĞĞºÍ¿Õ¸ñ
+					// å¦‚æœä¸æ˜¯å›è½¦æ¢è¡Œå’Œç©ºæ ¼
 					if (Utility.SEPERATOR_LINK.indexOf(ss[i]) == -1)
 						s1 += ss[i];
-					// ¶Ï¾ä
+					// æ–­å¥
 					if (s1.length() > 0 && !Utility.SENTENCE_BEGIN.equals(s1)) {
 						if (Utility.SEPERATOR_C_SUB_SENTENCE.indexOf(ss[i]) == -1
 								&& Utility.SEPERATOR_E_SUB_SENTENCE
@@ -49,7 +49,7 @@ public class SentenceSeg {
 						s1 = "";
 					}
 
-					// ÊÇ»Ø³µ»»ĞĞ·û»ò¿Õ¸ñ£¬Ôò²»ĞèÒª½øĞĞ·ÖÎö´¦Àí
+					// æ˜¯å›è½¦æ¢è¡Œç¬¦æˆ–ç©ºæ ¼ï¼Œåˆ™ä¸éœ€è¦è¿›è¡Œåˆ†æå¤„ç†
 					if (Utility.SEPERATOR_LINK.indexOf(ss[i]) != -1) {
 						result.add(new Sentence(ss[i]));
 						s1 = Utility.SENTENCE_BEGIN;

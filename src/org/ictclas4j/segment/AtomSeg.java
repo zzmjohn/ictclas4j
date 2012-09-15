@@ -7,7 +7,7 @@ import org.ictclas4j.utility.GFString;
 import org.ictclas4j.utility.Utility;
 
 /**
- * Ô­×Ó·Ö´Ê
+ * åŸå­åˆ†è¯
  * @author sinboy
  * @since 2007.6.1
  */
@@ -24,12 +24,12 @@ public class AtomSeg {
 
 	/**
 	 * <pre>
-	 *                 Ô­×Ó·Ö´Ê,·Ö³ÉÒ»¸ö¸öµÄ¶ÀÁ¢×Ö·û,¿ªÊ¼±êÖ¾ºÍ½áÊø±êÖ¾×öÒ»¸öÔ­×Óµ¥Î»¿´µÈ.
-	 *                 ±ÈÈç:Ê¼##Ê¼ËûËµµÄÈ·ÊµÔÚÀíÄ©##Ä©--&gt;Ê¼##Ê¼ Ëû Ëµ µÄ È· Êµ ÔÚ Àí Ä©##Ä©
+	 *                 åŸå­åˆ†è¯,åˆ†æˆä¸€ä¸ªä¸ªçš„ç‹¬ç«‹å­—ç¬¦,å¼€å§‹æ ‡å¿—å’Œç»“æŸæ ‡å¿—åšä¸€ä¸ªåŸå­å•ä½çœ‹ç­‰.
+	 *                 æ¯”å¦‚:å§‹##å§‹ä»–è¯´çš„ç¡®å®åœ¨ç†æœ«##æœ«--&gt;å§‹##å§‹ ä»– è¯´ çš„ ç¡® å® åœ¨ ç† æœ«##æœ«
 	 * </pre>
 	 * 
 	 * @param str
-	 *            Ô´×Ö·û´®
+	 *            æºå­—ç¬¦ä¸²
 	 * @return
 	 */
 	private ArrayList<Atom> atomSplit() {
@@ -70,7 +70,7 @@ public class AtomSeg {
 								.isNumeric(ss[i+1]))))
 					curType = Utility.CT_NUM;
 
-				// Èç¹ûÊÇºº×Ö¡¢·Ö¸ô·ûµÈ
+				// å¦‚æœæ˜¯æ±‰å­—ã€åˆ†éš”ç¬¦ç­‰
 				if (curType == Utility.CT_CHINESE || curType == Utility.CT_INDEX || curType == Utility.CT_DELIMITER
 						|| curType == Utility.CT_OTHER) {
 
@@ -81,9 +81,9 @@ public class AtomSeg {
 					result.add(atom);
 					sAtom = "";
 				}
-				// Èç¹ûÊÇÊı×Ö¡¢×ÖÄ¸¡¢µ¥×Ö½Ú·ûºÅ£¬Ôò°ÑÏàÁÚµÄÕâĞ©×öÎªÒ»¸öÔ­×Ó¡£±ÈÈç£ºÈıĞÇSHX-123ĞÍºÅµÄÊÖ»ú£¬ÔòÆäÖĞµÄSHX-123¾ÍÊÇÒ»¸öÔ­×Ó
+				// å¦‚æœæ˜¯æ•°å­—ã€å­—æ¯ã€å•å­—èŠ‚ç¬¦å·ï¼Œåˆ™æŠŠç›¸é‚»çš„è¿™äº›åšä¸ºä¸€ä¸ªåŸå­ã€‚æ¯”å¦‚ï¼šä¸‰æ˜ŸSHX-123å‹å·çš„æ‰‹æœºï¼Œåˆ™å…¶ä¸­çš„SHX-123å°±æ˜¯ä¸€ä¸ªåŸå­
 				else {
-					int nextType = 255;// ÏÂÒ»¸ö×Ö·ûµÄÀàĞÍ
+					int nextType = 255;// ä¸‹ä¸€ä¸ªå­—ç¬¦çš„ç±»å‹
 					if (i < ss.length - 1)
 						nextType = Utility.charType(ss[i + 1]);
 					if (nextType != curType || i == ss.length - 1) {

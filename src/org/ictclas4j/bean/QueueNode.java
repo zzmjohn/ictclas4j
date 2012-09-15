@@ -3,16 +3,16 @@ package org.ictclas4j.bean;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
- * ¶ÓÁĞ½Úµã
+ * é˜Ÿåˆ—èŠ‚ç‚¹
  * @author sinboy
  *
  */
 public class QueueNode {
-	private int parent;//¸¸½ÚµãµÄÎ»ÖÃ
+	private int parent;//çˆ¶èŠ‚ç‚¹çš„ä½ç½®
 
-	private int index;//·Ö´ÊÂ·¾¶µÄ±àºÅ,¼´µÚ¼¸Ìõ·Ö´ÊÂ·¾¶
+	private int index;//åˆ†è¯è·¯å¾„çš„ç¼–å·,å³ç¬¬å‡ æ¡åˆ†è¯è·¯å¾„
 
-	private double weight;//È¨ÖØ
+	private double weight;//æƒé‡
 
 	public QueueNode() {
 

@@ -6,11 +6,11 @@ public class SegResult {
 
 	private long startTime;
 
-	private String rawContent;// Ô­Ê¼·Ö´ÊÄÚÈİ
+	private String rawContent;// åŸå§‹åˆ†è¯å†…å®¹
 
-	private ArrayList<MidResult> mrList;// ÖĞ¼ä½á¹û
+	private ArrayList<MidResult> mrList;// ä¸­é—´ç»“æœ
 
-	private String finalResult;// ×îÖÕ·Ö´Ê½á¹û
+	private String finalResult;// æœ€ç»ˆåˆ†è¯ç»“æœ
 
 	public SegResult(String rawContent) {
 		this.rawContent = rawContent;
@@ -56,7 +56,7 @@ public class SegResult {
 		StringBuffer html = new StringBuffer();
 
 		if (rawContent != null) {
-			html.append("Ô­ÎÄÄÚÈİ£º");
+			html.append("åŸæ–‡å†…å®¹ï¼š");
 			html.append("<table border=\"1\" width=\"100%\"><tr><td width=\"100%\">");
 			html.append(rawContent);
 			html.append("</td></tr></table>");
@@ -68,7 +68,7 @@ public class SegResult {
 			}
 
 			if (finalResult != null) {
-				html.append("<p>×îÖÕ·Ö´Ê½á¹û£º");
+				html.append("<p>æœ€ç»ˆåˆ†è¯ç»“æœï¼š");
 				html.append("<table border=\"1\" width=\"100%\"><tr><td width=\"100%\">");
 				html.append("<font color=\"blue\" size=6><b>" + finalResult + "</b></font>");
 				html.append("</td></tr></table>");

@@ -6,13 +6,13 @@ import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 
 /**
- * ÏàÍ¬¿ªÍ·µÄ´Ê×é±í.
+ * ç›¸åŒå¼€å¤´çš„è¯ç»„è¡¨.
  * 
  * @author sinboy
  * 
  */
 public class WordTable {
-	// ´Ê×é¼¯µÄÊıÄ¿
+	// è¯ç»„é›†çš„æ•°ç›®
 	private int count;
 
 	private ArrayList<WordItem> words;

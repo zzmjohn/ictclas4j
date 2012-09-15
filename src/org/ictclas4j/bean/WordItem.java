@@ -3,23 +3,28 @@ package org.ictclas4j.bean;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
- * ´ÊÌõ.°üÀ¨´ÊÄÚÈİ¡¢³¤¶È¡¢¾ä±ú¼°Æµ¶È
+ * è¯æ¡.åŒ…æ‹¬è¯å†…å®¹ã€é•¿åº¦ã€å¥æŸ„åŠé¢‘åº¦
  * 
  * @author sinboy
  * 
  */
 public class WordItem {
-  
 	private String word;
-
-	private int len;
-
-	// ¾ä±ú£¬ÓÃÀ´±êÊ¶´ÊµÄ´ÊĞÔ
-	private int handle;
-
-	// Æµ¶È£¬ÓÃÀ´ËµÃ÷¸Ã´Ê³öÏÖÔÚÓïÁÏ¿âÖĞµÄ´ÎÊı»ò¸ÅÂÊ
-	private int freq;
-
+	private int len;//è¯åœ¨ç£ç›˜ä¸Šå­˜å‚¨çš„å­—èŠ‚é•¿åº¦
+	private int handle;// å¥æŸ„ï¼Œç”¨æ¥æ ‡è¯†è¯çš„è¯æ€§
+	private int freq;// é¢‘åº¦ï¼Œç”¨æ¥è¯´æ˜è¯¥è¯å‡ºç°åœ¨è¯­æ–™åº“ä¸­çš„æ¬¡æ•°æˆ–æ¦‚ç‡
+	
+	WordItem() {
+		
+	}
+	
+	WordItem(String _word,int _len,int _handle,int _freq) {
+		word=_word;
+		len=_len;
+		handle=_handle;
+		freq=_freq;
+	}
+	
 	public int getFreq() {
 		return freq;
 	}

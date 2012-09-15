@@ -3,13 +3,13 @@ package org.ictclas4j.bean;
 import java.util.ArrayList;
 
 /**
- * 队列
+ * 闃熷垪
  * 
  * @author sinboy
  * 
  */
 public class Queue {
-	private int curIndex;// 当前位置
+	private int curIndex;// 褰撳墠浣嶇疆
 
 	private ArrayList<QueueNode> queue;
 

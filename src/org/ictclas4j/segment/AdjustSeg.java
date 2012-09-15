@@ -9,14 +9,14 @@ import org.ictclas4j.utility.Utility;
 
 
 /**
- * ·Ö´Êµ÷Õû
+ * åˆ†è¯è°ƒæ•´
  * 
  * @author sinboy
  * @since 2007.6.1
  */
 public class AdjustSeg {
 	/**
-	 * ¶Ô³õ´Î·Ö´Ê½á¹û½øĞĞµ÷Õû£¬Ö÷ÒªÊÇ¶ÔÊ±¼ä¡¢ÈÕÆÚ¡¢Êı×ÖµÈ½øĞĞºÏ²¢»ò²ğ·Ö
+	 * å¯¹åˆæ¬¡åˆ†è¯ç»“æœè¿›è¡Œè°ƒæ•´ï¼Œä¸»è¦æ˜¯å¯¹æ—¶é—´ã€æ—¥æœŸã€æ•°å­—ç­‰è¿›è¡Œåˆå¹¶æˆ–æ‹†åˆ†
 	 * 
 	 * @return
 	 */
@@ -42,25 +42,24 @@ public class AdjustSeg {
 					isNum = true;
 					for (j = i + 1; j < sgs.size() - 1; j++) {
 						String temp = sgs.get(j).getSrcWord();
-						// Èç¹ûÏàÁÚµÄ¼¸µã×Ö·û¶¼ÊÇÊı×Ö£¬Ôò°ÑËüÃÇ½øĞĞºÏ²¢
+						// å¦‚æœç›¸é‚»çš„å‡ ç‚¹å­—ç¬¦éƒ½æ˜¯æ•°å­—ï¼Œåˆ™æŠŠå®ƒä»¬è¿›è¡Œåˆå¹¶
 						if (Utility.isAllNum(temp) || Utility.isAllChineseNum(temp)) {
 							isNum = true;
 							index = j;
 							curWord += temp;
 						} else
 							break;
-
 					}
 				}
 
-				// Èç¹û²»ÊÇÊı×Ö£¬µ«ÊÇ¿ÉÒÔºÍÇ°ÃæµÄÊı×Ö¹¹³ÉÈÕÆÚ£¬ÔòÖØĞÂÉèÖÃÇ°Ò»¸ö½Úµã
-				// ·ñÔò£¬Ö±½Ó°Ñ¸Ã½ÚµãÌí¼Óµ½½á¹û¼¯ÖĞ
+				// å¦‚æœä¸æ˜¯æ•°å­—ï¼Œä½†æ˜¯å¯ä»¥å’Œå‰é¢çš„æ•°å­—æ„æˆæ—¥æœŸï¼Œåˆ™é‡æ–°è®¾ç½®å‰ä¸€ä¸ªèŠ‚ç‚¹
+				// å¦åˆ™ï¼Œç›´æ¥æŠŠè¯¥èŠ‚ç‚¹æ·»åŠ åˆ°ç»“æœé›†ä¸­
 				if (!isNum) {
 					SegNode prevsn = null;
 					if (wordResult.size() > 0)
 						prevsn = wordResult.get(wordResult.size() - 1);
 					if (Utility.isDelimiter(curWord)) {
-						// Èç¹ûÉÏÒ»¸ö×Ö·ûÒ²ÊÇ·Ö¸ô·û£¬Ôò½øĞĞºÏ²¢
+						// å¦‚æœä¸Šä¸€ä¸ªå­—ç¬¦ä¹Ÿæ˜¯åˆ†éš”ç¬¦ï¼Œåˆ™è¿›è¡Œåˆå¹¶
 						if (prevsn != null && Utility.isDelimiter(prevsn.getWord())) {
 							prevsn.setCol(sn.getCol());
 							prevsn.appendWord(curWord);
@@ -68,7 +67,7 @@ public class AdjustSeg {
 						} else
 							// 'w'*256;Set the POS with 'w'
 							pos = POSTag.PUNC;
-					} else if (curWord.length() == 1 && "ÔÂÈÕÊ±·ÖÃë".indexOf(curWord) != -1 || "ÔÂ·İ".equals(curWord)) {
+					} else if (curWord.length() == 1 && "æœˆæ—¥æ—¶åˆ†ç§’".indexOf(curWord) != -1 || "æœˆä»½".equals(curWord)) {
 						if (prevsn != null && prevsn.getPos() == -POSTag.NUM) {
 							prevsn.setCol(sn.getCol());
 							prevsn.setWord(Utility.UNKNOWN_TIME);
@@ -76,7 +75,7 @@ public class AdjustSeg {
 							prevsn.setPos(-POSTag.TIME);
 							continue;
 						}
-					} else if ("Äê".equals(curWord)) {
+					} else if ("å¹´".equals(curWord)) {
 						if (prevsn != null && Utility.isYearTime(prevsn.getSrcWord())) {
 							prevsn.setCol(sn.getCol());
 							prevsn.setWord(Utility.UNKNOWN_TIME);
@@ -87,16 +86,16 @@ public class AdjustSeg {
 					}
 				} else {
 
-					// Èç¹ûµ±Ç°×Ö·û´®½ö½öÊÇÓĞÊı×Ö×Ö·û×é³ÉµÄ¶ø²»ÊÇÒ»¸öÊı×Ö£¬Ôò°ÑËû¶ÔÓ¦µÄÔ­Ê¼½ÚµãĞÅÏ¢Ò²Ìí¼Óµ½½á¹û¼¯ÖĞ
+					// å¦‚æœå½“å‰å­—ç¬¦ä¸²ä»…ä»…æ˜¯æœ‰æ•°å­—å­—ç¬¦ç»„æˆçš„è€Œä¸æ˜¯ä¸€ä¸ªæ•°å­—ï¼Œåˆ™æŠŠä»–å¯¹åº”çš„åŸå§‹èŠ‚ç‚¹ä¿¡æ¯ä¹Ÿæ·»åŠ åˆ°ç»“æœé›†ä¸­
 					if (NumUtil.isNumStrNotNum(curWord)) {
 						for (int k = i; k <= index; k++)
 							wordResult.add(sgs.get(k));
 						continue;
 					}
-					// ÊÇÒ»¸öÊı×Ö
+					// æ˜¯ä¸€ä¸ªæ•°å­—
 					else {
-						// Èç¹ûÊÇÀàËÆÕâÑùµÄĞÎÊ½£º
-						// 3-4ÔÂ£¬¼´µ±Ç°ÔªËØÊÇÒ»¸öÊı×Ö£¬Ç°Ò»¸öÊÇ·Ö¸ô·û£¬Ç°Ç°Ò»¸öÒ²ÊÇÊı×Ö£¬Ôòµ±Ç°ÔªËØÓ¦¸ÃÊÇÊı×Ö
+						// å¦‚æœæ˜¯ç±»ä¼¼è¿™æ ·çš„å½¢å¼ï¼š
+						// 3-4æœˆï¼Œå³å½“å‰å…ƒç´ æ˜¯ä¸€ä¸ªæ•°å­—ï¼Œå‰ä¸€ä¸ªæ˜¯åˆ†éš”ç¬¦ï¼Œå‰å‰ä¸€ä¸ªä¹Ÿæ˜¯æ•°å­—ï¼Œåˆ™å½“å‰å…ƒç´ åº”è¯¥æ˜¯æ•°å­—
 						boolean flag = false;
 						int size = wordResult.size();
 						if (wordResult.size() > 1) {
@@ -108,14 +107,14 @@ public class AdjustSeg {
 							}
 						}
 						if (!flag) {
-							if (curWord.indexOf("µã") == curWord.length() - 1) {
+							if (curWord.indexOf("ç‚¹") == curWord.length() - 1) {
 								pos = -POSTag.TIME;
 								srcWord = curWord;
 								curWord = Utility.UNKNOWN_TIME;
 							} else if (curWord.length() > 1) {
 								String last = curWord.substring(curWord.length() - 1);
-								// Èç¹ûµ±Ç°´ÊµÄ×îºóÒ»¸ö×Ö·û²»ÊÇÈçÏÂ¼¸ÖÖÇé¿ö£¬ÔòËµÃ÷ËûÊÇÒ»¸öÊı×Ö¡£·ñÔò×îºóÒ»¸ö×Ö·û¾ÍÊÇÒ»¸ö±êµã£¬²¢°ÑËü·ÖÀë³öÀ´
-								if ("¡Ã¡¤£®£¯./".indexOf(last) == -1) {
+								// å¦‚æœå½“å‰è¯çš„æœ€åä¸€ä¸ªå­—ç¬¦ä¸æ˜¯å¦‚ä¸‹å‡ ç§æƒ…å†µï¼Œåˆ™è¯´æ˜ä»–æ˜¯ä¸€ä¸ªæ•°å­—ã€‚å¦åˆ™æœ€åä¸€ä¸ªå­—ç¬¦å°±æ˜¯ä¸€ä¸ªæ ‡ç‚¹ï¼Œå¹¶æŠŠå®ƒåˆ†ç¦»å‡ºæ¥
+								if ("âˆ¶Â·ï¼ï¼./".indexOf(last) == -1) {
 									pos = -POSTag.NUM;
 									srcWord = curWord;
 									curWord = Utility.UNKNOWN_NUM;
@@ -125,12 +124,12 @@ public class AdjustSeg {
 										pos = -POSTag.NUM;
 										srcWord = curWord.substring(0, curWord.length() - 1);
 										curWord = Utility.UNKNOWN_NUM;
-										index--;
+										//index--;
 									} else if (curWord.length() > 2) {
 										pos = -POSTag.NUM;
 										srcWord = curWord.substring(0, curWord.length() - 2);
 										curWord = Utility.UNKNOWN_NUM;
-										index -= 2;
+										//index -= 2;
 									}
 								}
 							}
@@ -156,7 +155,7 @@ public class AdjustSeg {
 	}
 
 	/**
-	 * ¶Ô·Ö´Ê½á¹û×ö×îÖÕµÄµ÷Õû£¬Ö÷ÒªÊÇÈËÃûµÄ²ğ·Ö»òÖØµş´ÊµÄºÏ²¢
+	 * å¯¹åˆ†è¯ç»“æœåšæœ€ç»ˆçš„è°ƒæ•´ï¼Œä¸»è¦æ˜¯äººåçš„æ‹†åˆ†æˆ–é‡å è¯çš„åˆå¹¶
 	 * 
 	 * @param optSegPath
 	 * @param personTagger
@@ -177,7 +176,7 @@ public class AdjustSeg {
 				// if (wr.getPos() == POSTag.NOUN_PERSON
 				// && (pname = Utility.chineseNameSplit(wr.getSrcWord(),
 				// personTagger)) != null
-				// && !"Ò¶ÀûÇÕ".equals(wr.getSrcWord())) {
+				// && !"å¶åˆ©é’¦".equals(wr.getSrcWord())) {
 				// if (pname.getFirstName() != null) {
 				// SegNode wr2 = new SegNode();
 				// wr2.setWord(pname.getFirstName());
@@ -201,7 +200,7 @@ public class AdjustSeg {
 				//
 				// isBeProcess = true;
 				// }
-				// Rule2 for overlap words ABB Ò»¶Î¶Î¡¢Ò»Æ¬Æ¬
+				// Rule2 for overlap words ABB ä¸€æ®µæ®µã€ä¸€ç‰‡ç‰‡
 				if (wr.getPos() == POSTag.NUM && i + 2 < optSegPath.size() && optSegPath.get(i + 1).getLen() == 2
 						&& optSegPath.get(i + 1).getSrcWord().equals(optSegPath.get(i + 2).getSrcWord())) {
 					SegNode wr2 = new SegNode();
@@ -225,7 +224,7 @@ public class AdjustSeg {
 						wr2.setPos(POSTag.NOUN);
 
 					i += 1;
-					if (optSegPath.get(i + 1).getLen() == 2) {// AAB:Ï´/Ï´/Á³¡¢ÃÉÃÉÁÁ
+					if (optSegPath.get(i + 1).getLen() == 2) {// AAB:æ´—/æ´—/è„¸ã€è’™è’™äº®
 						if ((wr2.getPos() == POSTag.VERB && optSegPath.get(i + 1).getPos() == POSTag.NOUN)
 								|| (wr2.getPos() == POSTag.ADJ && optSegPath.get(i + 1).getPos() == POSTag.ADJ)) {
 							wr2.setWord(wr2.getWord() + optSegPath.get(i + 1).getSrcWord());
@@ -235,7 +234,7 @@ public class AdjustSeg {
 					isBeProcess = true;
 					result.add(wr2);
 				}
-				// Rule 4: AAB Ï´/Ï´Ôè
+				// Rule 4: AAB æ´—/æ´—æ¾¡
 				else if (wr.getLen() == 2 && i + 1 < optSegPath.size()
 						&& (wr.getPos() == POSTag.VERB || wr.getPos() == POSTag.ADJ)
 						&& optSegPath.get(i + 1).getLen() == 4
@@ -252,7 +251,7 @@ public class AdjustSeg {
 					result.add(wr2);
 				} else if (wr.getPos() / 256 == 'u' && wr.getPos() % 256 != 0)// uj,ud,uv,uz,ul,ug->u
 					wr.setPos('u' * 256);
-				// AABB,ÆÓÆÓËØËØ
+				// AABB,æœ´æœ´ç´ ç´ 
 				else if (wr.getLen() == 2 && i + 2 < optSegPath.size() && optSegPath.get(i + 1).getLen() == 4
 						&& optSegPath.get(i + 1).getWord().indexOf(wr.getWord()) == 0
 						&& optSegPath.get(i + 1).getWord().indexOf(optSegPath.get(i + 2).getWord()) == 0) {
@@ -263,7 +262,7 @@ public class AdjustSeg {
 					isBeProcess = true;
 					result.add(wr2);
 				}
-				// 28275=='n'*256+'s' µØÃû+X
+				// 28275=='n'*256+'s' åœ°å+X
 				else if (wr.getPos() == POSTag.NOUN_SPACE && i + 1 < optSegPath.size())// PostFix
 				{
 					SegNode next = optSegPath.get(i + 1);
@@ -274,21 +273,21 @@ public class AdjustSeg {
 						i += 1;
 						isBeProcess = true;
 						result.add(wr2);
-					} else if ("¶Ó".equals(next.getSrcWord())) {
+					} else if ("é˜Ÿ".equals(next.getSrcWord())) {
 						SegNode wr2 = new SegNode();
 						wr2.setWord(wr.getSrcWord() + next.getSrcWord());
 						wr2.setPos(POSTag.NOUN_ORG);
 						i += 1;
 						isBeProcess = true;
 						result.add(wr2);
-					} else if (optSegPath.get(i + 1).getLen() == 2 && "ÓïÎÄ×Ö±­".indexOf(next.getSrcWord()) != -1) {
+					} else if (optSegPath.get(i + 1).getLen() == 2 && "è¯­æ–‡å­—æ¯".indexOf(next.getSrcWord()) != -1) {
 						SegNode wr2 = new SegNode();
 						wr2.setWord(wr.getSrcWord() + next.getSrcWord());
 						wr2.setPos(POSTag.NOUN_ZHUAN);
 						i += 1;
 						isBeProcess = true;
 						result.add(wr2);
-					} else if ("Òá".equals(next.getSrcWord())) {
+					} else if ("è£”".equals(next.getSrcWord())) {
 						SegNode wr2 = new SegNode();
 						wr2.setWord(wr.getSrcWord() + next.getSrcWord());
 						wr2.setPos(POSTag.NOUN);
@@ -298,7 +297,7 @@ public class AdjustSeg {
 					}
 				} else if (wr.getPos() == POSTag.VERB  || wr.getPos() == POSTag.VERB_NOUN  ||wr.getPos() == POSTag.NOUN)// v
 				{
-					if (i + 1 < optSegPath.size() && "Ô±".equals(optSegPath.get(i + 1).getSrcWord())) {
+					if (i + 1 < optSegPath.size() && "å‘˜".equals(optSegPath.get(i + 1).getSrcWord())) {
 						SegNode wr2 = new SegNode();
 						wr2.setWord(wr.getSrcWord() + optSegPath.get(i + 1).getSrcWord());
 						wr2.setPos(POSTag.NOUN);
@@ -308,8 +307,8 @@ public class AdjustSeg {
 					}
 				}
 				// www/nx ./w sina/nx;
-				// £Å£É£Í/nx -£¶£°£±/m
-				// £Ó£È£Í/nx £­/w £±£°£±/m
+				// ï¼¥ï¼©ï¼­/nx -ï¼–ï¼ï¼‘/m
+				// ï¼³ï¼¨ï¼­/nx ï¼/w ï¼‘ï¼ï¼‘/m
 				// 28280=='n'*256+'r'
 				// 27904=='m'*256
 				else if (wr.getPos() == POSTag.NOUN_LETTER && i + 1 < optSegPath.size()) {
@@ -318,7 +317,7 @@ public class AdjustSeg {
 					wr2.setPos(POSTag.NOUN_LETTER);
 					while (true) {
 						SegNode nextSN = optSegPath.get(i + 1);
-						if (nextSN.getPos() == POSTag.NOUN_LETTER || ".£®-£­".indexOf(nextSN.getSrcWord()) != -1
+						if (nextSN.getPos() == POSTag.NOUN_LETTER || ".ï¼-ï¼".indexOf(nextSN.getSrcWord()) != -1
 								|| (nextSN.getPos() == POSTag.NUM && Utility.isAllNum(nextSN.getSrcWord()))) {
 							wr2.setWord(wr2.getSrcWord() + nextSN.getSrcWord());
 							i++;
