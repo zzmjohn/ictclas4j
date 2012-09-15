@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="JUNIT_HOME/junit.jar" sourcepath="ECLIPSE_HOME/plugins/org.eclipse.jdt.source_3.1.0/src/org.junit_3.8.1/junitsrc.zip"/>
+	<classpathentry kind="lib" path="E:/gftech/library/log4j-1.2.12.jar" sourcepath="D:/Apache/logging-log4j-1.2.12/src"/>
+	<classpathentry kind="lib" path="E:/gftech/library/commons-lang-2.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
