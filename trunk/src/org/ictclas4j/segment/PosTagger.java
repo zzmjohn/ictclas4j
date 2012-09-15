@@ -1,5 +1,7 @@
 package org.ictclas4j.segment;
 
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import org.ictclas4j.bean.ContextStat;
@@ -7,738 +9,775 @@ import org.ictclas4j.bean.Dictionary;
 import org.ictclas4j.bean.POS;
 import org.ictclas4j.bean.SegNode;
 import org.ictclas4j.bean.WordItem;
-import org.ictclas4j.utility.DebugUtil;
 import org.ictclas4j.utility.POSTag;
 import org.ictclas4j.utility.Utility;
 import org.ictclas4j.utility.Utility.TAG_TYPE;
 
-
 /**
- * Î´µÇÂ¼´ÊµÄ´¦Àí
+ * æœªç™»å½•è¯çš„å¤„ç†
  * 
  * @author sinboy
  * @since 2007.5.17 updated
  * 
  */
 public class PosTagger {
+  private Dictionary coreDict;
 
-	private Dictionary coreDict;
+  private Dictionary unknownDict;
 
-	private Dictionary unknownDict;
+  private ContextStat context;
 
-	private ContextStat context;
+  private int pos;
 
-	private int pos;
+  private TAG_TYPE tagType;
 
-	private TAG_TYPE tagType;
+  String unknownFlags;
 
-	String unknownFlags;
+  public PosTagger(TAG_TYPE type, String fileName, Dictionary coreDict) {
+    if (fileName != null) {
+      this.coreDict = coreDict;
+      if (type == Utility.TAG_TYPE.TT_NORMAL)
+        this.unknownDict = coreDict;
+      else {
+        unknownDict = new Dictionary();
+        unknownDict.load(fileName + ".dct");
+      }
+      context = new ContextStat();
+      context.load(fileName + ".ctx");
+      this.tagType = type;
 
-	public PosTagger(TAG_TYPE type, String fileName, Dictionary coreDict) {
-		if (fileName != null) {
-			this.coreDict = coreDict;
-			if (type == Utility.TAG_TYPE.TT_NORMAL)
-				this.unknownDict = coreDict;
-			else {
-				unknownDict = new Dictionary();
-				unknownDict.load(fileName + ".dct");
+      switch (type) {
+      case TT_PERSON:
+        // Set the special flag for transliterations
+      case TT_TRANS_PERSON:
+        pos = -POSTag.NOUN_PERSON;
+        unknownFlags = "æœª##äºº";
+        break;
+      case TT_PLACE:
+        pos = -POSTag.NOUN_SPACE;
+        unknownFlags = "æœª##åœ°";
+        break;
+      default:
+        pos = 0;
+        break;
+      }
+    }
+  }
 
-			}
-			context = new ContextStat();
-			context.load(fileName + ".ctx");
-			this.tagType = type;
+  public PosTagger(TAG_TYPE type, InputStream PosTaggerDctIn, InputStream PosTaggerCtxIn,
+      Dictionary coreDict) {
+    if (PosTaggerCtxIn != null) {
 
-			switch (type) {
-			case TT_PERSON:
-				// Set the special flag for transliterations
-			case TT_TRANS_PERSON:
-				pos = -POSTag.NOUN_PERSON;
-				unknownFlags = "Î´##ÈË";
-				break;
-			case TT_PLACE:
-				pos = -POSTag.NOUN_SPACE;
-				unknownFlags = "Î´##µØ";
-				break;
-			default:
-				pos = 0;
-				break;
-			}
-		}
-	}
+      this.coreDict = coreDict;
+      if (type == Utility.TAG_TYPE.TT_NORMAL)
+        this.unknownDict = coreDict;
+      else {
+        unknownDict = new Dictionary();
+        unknownDict.load(PosTaggerDctIn, false);
+      }
+      context = new ContextStat();
+      context.load(PosTaggerCtxIn, false);
+      this.tagType = type;
 
-	/**
-	 * ´Ó¾­¹ı³õ·ÖµÄ½á¹ûÖĞ£¬ÕÒ³ö¹¹³ÉÈËÃû¡¢µØÃû»òÆäËü´ÊµÄÎ´µÇÂ½´Ê
-	 * 
-	 * @param segGraph
-	 * @param coreDict
-	 * @return
-	 */
-	public boolean recognition(SegGraph segGraph, ArrayList<SegNode> sns) {
+      switch (type) {
+      case TT_PERSON:
+        // Set the special flag for transliterations
+      case TT_TRANS_PERSON:
+        pos = -POSTag.NOUN_PERSON;
+        unknownFlags = "æœª##äºº";
+        break;
+      case TT_PLACE:
+        pos = -POSTag.NOUN_SPACE;
+        unknownFlags = "æœª##åœ°";
+        break;
+      default:
+        pos = 0;
+        break;
+      }
+    }
+  }
 
-		if (segGraph != null && sns != null && coreDict != null && unknownDict != null && context != null) {
-			posTag(sns);
-			getBestPos(sns);
-			DebugUtil.outputPostag(sns);
-			switch (tagType) {
-			case TT_PERSON:// Person recognition
-				personRecognize(segGraph, sns);
-				break;
-			case TT_PLACE:// Place name recognition
-			case TT_TRANS_PERSON:// Transliteration Person
-				placeRecognize(segGraph, sns, coreDict);
-				break;
-			}
-		}
+  /**
+   * ä»ç»è¿‡åˆåˆ†çš„ç»“æœä¸­ï¼Œæ‰¾å‡ºæ„æˆäººåã€åœ°åæˆ–å…¶å®ƒè¯çš„æœªç™»é™†è¯
+   * 
+   * @param segGraph
+   * @param coreDict
+   * @return
+   */
+  public boolean recognition(SegGraph segGraph, ArrayList<SegNode> sns) {
 
-		return true;
-	}
+    if (segGraph != null && sns != null && coreDict != null && unknownDict != null
+        && context != null) {
+      posTag(sns);
+      getBestPos(sns);
+      // DebugUtil.outputPostag(sns);
+      switch (tagType) {
+      case TT_PERSON:// Person recognition
+        personRecognize(segGraph, sns);
+        break;
+      case TT_PLACE:// Place name recognition
+      case TT_TRANS_PERSON:// Transliteration Person
+        placeRecognize(segGraph, sns, coreDict);
+        break;
+      }
+    }
 
-	public boolean recognition(ArrayList<SegNode> sns) {
+    return true;
+  }
 
-		if (sns != null && unknownDict != null && context != null) {
-			posTag(sns);
-			getBestPos(sns);
-			DebugUtil.outputPostag(sns);
-			switch (tagType) {
-			case TT_NORMAL:
-				for (SegNode sn : sns) {
-					if (sn.getPos() == 0) {
-						sn.setPos(getBestTag(sn));
-					}
-				}
-			}
-		}
+  public boolean recognition(ArrayList<SegNode> sns) {
 
-		return true;
-	}
+    if (sns != null && unknownDict != null && context != null) {
+      posTag(sns);
+      getBestPos(sns);
+      // DebugUtil.outputPostag(sns);
+      switch (tagType) {
+      case TT_NORMAL:
+        for (SegNode sn : sns) {
+          if (sn.getPos() == 0) {
+            sn.setPos(getBestTag(sn));
+          }
+        }
+      }
+    }
 
-	/**
-	 * ¶ÔËùÓĞµÄ´ÊĞÔ½øĞĞ±ê¼Ç
-	 * 
-	 * @param frs
-	 *            ³õ´ÎÇĞ·ÖµÄ½á¹û
-	 * @pararm startIndex ¿ªÊ¼½øĞĞ´ÊĞÔ±ê¼ÇµÄÎ»ÖÃ
-	 * @param coreDict
-	 *            ºËĞÄ´Êµä¿â
-	 * @param unknownDict
-	 *            Î´µÇÂ½´Êµä¿â
-	 * @return ÏÂÒ»¸öĞèÒª¿ªÊ¼µÄÎ»ÖÃ
-	 */
-	public void posTag(ArrayList<SegNode> sns) {
+    return true;
+  }
 
-		if (sns != null && coreDict != null && unknownDict != null && context != null) {
-			int i = 0;
-			String curWord = null;
+  /**
+   * å¯¹æ‰€æœ‰çš„è¯æ€§è¿›è¡Œæ ‡è®°
+   * 
+   * @param frs
+   *          åˆæ¬¡åˆ‡åˆ†çš„ç»“æœ
+   * @pararm startIndex å¼€å§‹è¿›è¡Œè¯æ€§æ ‡è®°çš„ä½ç½®
+   * @param coreDict
+   *          æ ¸å¿ƒè¯å…¸åº“
+   * @param unknownDict
+   *          æœªç™»é™†è¯å…¸åº“
+   * @return ä¸‹ä¸€ä¸ªéœ€è¦å¼€å§‹çš„ä½ç½®
+   */
+  public void posTag(ArrayList<SegNode> sns) {
+    if (sns != null && coreDict != null && unknownDict != null && context != null) {
+      int i = 0;
+      String curWord = null;
 
-			for (; i < sns.size(); i++) {
-				SegNode sn = sns.get(i);
-				sn.setAllPos(null);
-				curWord = sn.getSrcWord();
-				// if (tagType == Utility.TAG_TYPE.TT_NORMAL ||
-				// !unknownDict.isExist(sn.getWord(), 44)) {
-				//
-				// }
+      for (; i < sns.size(); i++) {
+        SegNode sn = sns.get(i);
+        sn.setAllPos(null);
+        curWord = sn.getSrcWord();
+        // if (tagType == Utility.TAG_TYPE.TT_NORMAL ||
+        // !unknownDict.isExist(sn.getWord(), 44)) {
+        //
+        // }
 
-				if (tagType != Utility.TAG_TYPE.TT_NORMAL) {
+        if (tagType != Utility.TAG_TYPE.TT_NORMAL) {
 
-					// °ÑÈ«½Ç×Ö·û³µ³É°ë½ÇµÄ×Ö·û
-					if (tagType == Utility.TAG_TYPE.TT_TRANS_PERSON && i > 0) {
-						String prevWord = sns.get(i - 1).getSrcWord();
-						if (Utility.charType(prevWord) == Utility.CT_CHINESE) {
-							if (".".equals(curWord))
-								curWord = "£®";
-							else if ("-".equals(curWord))
-								curWord = "£­";
-						}
-					}
+          // æŠŠå…¨è§’å­—ç¬¦è½¦æˆåŠè§’çš„å­—ç¬¦
+          if (tagType == Utility.TAG_TYPE.TT_TRANS_PERSON && i > 0) {
+            String prevWord = sns.get(i - 1).getSrcWord();
+            if (Utility.charType(prevWord) == Utility.CT_CHINESE) {
+              if (".".equals(curWord))
+                curWord = "ï¼";
+              else if ("-".equals(curWord))
+                curWord = "ï¼";
+            }
+          }
 
-					// ´ÓunknownDict´Êµä¿âÖĞ»ñÈ¡µ±Ç°µÄËùÓĞ´ÊĞÔ
-					ArrayList<WordItem> wis = unknownDict.getHandle(curWord);
-					for (int j = 0; wis != null && j < wis.size(); j++) {
-						WordItem wi = wis.get(j);
-						int tag = wi.getHandle();
-						double freq = -Math.log((1 + wi.getFreq()));
-						freq += Math.log((context.getFreq(0, wi.getHandle()) + wis.size() + 1));
-						POS pos = new POS(tag, freq);
-						sn.addPos(pos);
-					}
+          // ä»unknownDictè¯å…¸åº“ä¸­è·å–å½“å‰çš„æ‰€æœ‰è¯æ€§
+          ArrayList<WordItem> wis = unknownDict.getHandle(curWord);
+          for (int j = 0; wis != null && j < wis.size(); j++) {
+            WordItem wi = wis.get(j);
+            int tag = wi.getHandle();
+            double freq = -Math.log((1 + wi.getFreq()));
+            freq += Math.log((context.getFreq(0, wi.getHandle()) + wis.size() + 1));
+            POS pos = new POS(tag, freq);
+            sn.addPos(pos);
+          }
 
-					if (Utility.SENTENCE_BEGIN.equals(curWord))
-						sn.addPos(new POS(100, 0));
+          if (Utility.SENTENCE_BEGIN.equals(curWord))
+            sn.addPos(new POS(100, 0));
 
-					else if (Utility.SENTENCE_END.equals(curWord))
-						sn.addPos(new POS(101, 0));
-					else {
-						int nFreq = 0;
-						wis = coreDict.getHandle(curWord);
-						if (wis != null) {
-							for (WordItem wi : wis)
-								nFreq += wi.getFreq();
+          else if (Utility.SENTENCE_END.equals(curWord))
+            sn.addPos(new POS(101, 0));
+          else {
+            int nFreq = 0;
+            wis = coreDict.getHandle(curWord);
+            if (wis != null) {
+              for (WordItem wi : wis)
+                nFreq += wi.getFreq();
 
-							if (wis.size() > 0) {
-								double freq = -Math.log((double) (1 + nFreq));
-								freq += Math.log((double) (context.getFreq(0, 0) + wis.size()));
-								sn.addPos(new POS(0, freq));
-							}
-						}
-					}
-				} else {
-					if (sn.getPos() > 0) {
-						int tag = sn.getPos();
-						double value = -Math.log(sn.getValue());
-						value += Math.log(context.getFreq(0, tag));
-						if (value < 0)
-							value = 0;
-						sn.addPos(new POS(tag, value));
-					} else {
-						if (sn.getPos() < 0) {
-							sn.setPos(-sn.getPos());
-							sn.addPos(new POS(-sn.getPos(), sn.getValue()));
-						}
-						ArrayList<WordItem> wis = coreDict.getHandle(curWord);
-						if (wis != null) {
-							for (WordItem wi : wis) {
-								int tag = wi.getHandle();
-								double value = -Math.log(1 + wi.getFreq());
-								value += Math.log(context.getFreq(0, tag) + wis.size());
-								sn.addPos(new POS(tag, value));
-							}
-						}
-					}
-				}
+              if (wis.size() > 0) {
+                double freq = -Math.log((double) (1 + nFreq));
+                freq += Math.log((double) (context.getFreq(0, 0) + wis.size()));
+                sn.addPos(new POS(0, freq));
+              }
+            }
+          }
+        } else {
+          if (sn.getPos() > 0) {
+            int tag = sn.getPos();
+            double value = -Math.log(sn.getValue());
+            value += Math.log(context.getFreq(0, tag));
+            if (value < 0)
+              value = 0;
+            sn.addPos(new POS(tag, value));
+          } else {
+            if (sn.getPos() < 0) {
+              sn.setPos(-sn.getPos());
+              sn.addPos(new POS(-sn.getPos(), sn.getValue()));
+            }
+            ArrayList<WordItem> wis = coreDict.getHandle(curWord);
+            if (wis != null) {
+              for (WordItem wi : wis) {
+                int tag = wi.getHandle();
+                double value = -Math.log(1 + wi.getFreq());
+                value += Math.log(context.getFreq(0, tag) + wis.size());
+                sn.addPos(new POS(tag, value));
+              }
+            }
+          }
+        }
 
-				if (sn.getAllPos() == null)
-					guessPos(tagType, sn);
-				
-				// Èç¹ûÒ»¸ö´Ê½Úµã¶ÔÓ¦µÄallPosÎªnull£¬ÔòËµÃ÷ËüÎŞ·¨µ¥¶À³É´Ê
-				// ËüµÄ´ÊĞÔËæÏÂÒ»¸ö´ÊµÄ´ÊĞÔ
-				if (i - 1 >= 0 && sns.get(i - 1).getPosSize() == -1) {
-					if (sn.getPosSize() > 0) {
-						POS pos = new POS(sn.getAllPos().get(0).getTag(), 0);
-						sns.get(i - 1).addPos(pos);
-					}
-				}
-			}
+        if (sn.getAllPos() == null)
+          guessPos(tagType, sn);
 
-			// Ìí¼ÓÒ»¸ö½áÊøµã
-			SegNode last = sns.get(i - 1);
-			if (last != null) {
-				SegNode sn = new SegNode();
-				int tag = 0;
-				if (tagType != Utility.TAG_TYPE.TT_NORMAL)
-					tag = 101;
-				else
-					tag = 1;
-				POS pos = new POS(tag, 0);
-				sn.addPos(pos);
-				sns.add(sn);
-			}
-		}
-	}
+        // å¦‚æœä¸€ä¸ªè¯èŠ‚ç‚¹å¯¹åº”çš„allPosä¸ºnullï¼Œåˆ™è¯´æ˜å®ƒæ— æ³•å•ç‹¬æˆè¯
+        // å®ƒçš„è¯æ€§éšä¸‹ä¸€ä¸ªè¯çš„è¯æ€§
+        if (i - 1 >= 0 && sns.get(i - 1).getPosSize() == -1) {
+          if (sn.getPosSize() > 0) {
+            POS pos = new POS(sn.getAllPos().get(0).getTag(), 0);
+            sns.get(i - 1).addPos(pos);
+          }
+        }
+      }
 
-	/**
-	 * È¡µÃÉÏÒ»¸ö´ÊµÄN¸ö´ÊĞÔËäºÍµ±Ç°´ÊµÄ´ÊĞÔ×îÆ¥ÅäµÄÄÇÒ»¸ö
-	 */
-	private void getBestPos(ArrayList<SegNode> sns) {
-		ArrayList<POS> prevAllPos = null;
-		ArrayList<POS> allPos = null;
-		if (sns != null && context != null) {
-			for (int i = 0; i < sns.size(); i++) {
-				if (i == 0) {
-					int pos = tagType != Utility.TAG_TYPE.TT_NORMAL ? 100 : 0;
-					prevAllPos = new ArrayList<POS>();
-					prevAllPos.add(new POS(pos, 0));
-				} else {
-					prevAllPos = sns.get(i - 1).getAllPos();
-				}
-				allPos = sns.get(i).getAllPos(); 
-				for (POS pos : allPos) {
-					int minPrev = 0;
-					double minFreq = 1000;
-					for (int k = 0; k < prevAllPos.size(); k++) {
-						POS prevPos = prevAllPos.get(k);
-						double temp = context.getPossibility(0, prevPos.getTag(), pos.getTag());
-						temp = -Math.log(temp) + prevPos.getFreq();
-						if (temp < minFreq) {
-							minFreq = temp;
-							minPrev = k;
-						}
-					}
+      // æ·»åŠ ä¸€ä¸ªç»“æŸç‚¹
+      SegNode last = sns.get(i - 1);
+      if (last != null) {
+        SegNode sn = new SegNode();
+        int tag = 0;
+        if (tagType != Utility.TAG_TYPE.TT_NORMAL)
+          tag = 101;
+        else
+          tag = 1;
+        POS pos = new POS(tag, 0);
+        sn.addPos(pos);
+        sns.add(sn);
+      }
+    }
+  }
 
-					pos.setPrev(minPrev);
-					pos.setFreq(pos.getFreq() + minFreq);
-				}
-			}
+  /**
+   * å–å¾—ä¸Šä¸€ä¸ªè¯çš„Nä¸ªè¯æ€§è™½å’Œå½“å‰è¯çš„è¯æ€§æœ€åŒ¹é…çš„é‚£ä¸€ä¸ª
+   */
+  private void getBestPos(ArrayList<SegNode> sns) {
+    ArrayList<POS> prevAllPos = null;
+    ArrayList<POS> allPos = null;
+    if (sns != null && context != null) {
+      for (int i = 0; i < sns.size(); i++) {
+        if (i == 0) {
+          int pos = tagType != Utility.TAG_TYPE.TT_NORMAL ? 100 : 0;
+          prevAllPos = new ArrayList<POS>();
+          prevAllPos.add(new POS(pos, 0));
+        } else {
+          prevAllPos = sns.get(i - 1).getAllPos();
+        }
+        allPos = sns.get(i).getAllPos();
+        if (allPos != null)
+          for (POS pos : allPos) {
+            int minPrev = 0;
+            double minFreq = 1000;
+            for (int k = 0; prevAllPos != null && k < prevAllPos.size(); k++) {
+              POS prevPos = prevAllPos.get(k);
+              double temp = context.getPossibility(0, prevPos.getTag(), pos.getTag());
+              temp = -Math.log(temp) + prevPos.getFreq();
+              if (temp < minFreq) {
+                minFreq = temp;
+                minPrev = k;
+              }
+            }
 
-			tagBest(sns);
-		}
-	}
+            pos.setPrev(minPrev);
+            pos.setFreq(pos.getFreq() + minFreq);
+          }
+      }
 
-	// ²Â²â¸Ã´ÊµÄ´ÊĞÔ
-	private int guessPos(TAG_TYPE tagType, SegNode sn) {
-		int result = -1;
-		if (sn != null && context != null) {
-			int charType;
+      tagBest(sns);
+    }
+  }
 
-			String word = sn.getWord();
-			double freq = 0;
+  // çŒœæµ‹è¯¥è¯çš„è¯æ€§
+  private int guessPos(TAG_TYPE tagType, SegNode sn) {
+    int result = -1;
+    if (sn != null && context != null) {
+      int charType;
 
-			switch (tagType) {
-			case TT_NORMAL:
-				break;
-			case TT_PERSON:
-				if (word.indexOf("¡Á¡Á") != -1) {
-					freq = (double) 1 / (double) (context.getFreq(0, 6) + 1);
-					sn.addPos(new POS(6, freq));
-				} else {
-					freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-					sn.addPos(new POS(0, freq));
+      String word = sn.getWord();
+      double freq = 0;
 
-					if (sn.getLen() >= 4) {
-						freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-						sn.addPos(new POS(0, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
-						sn.addPos(new POS(11, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
-						sn.addPos(new POS(12, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
-						sn.addPos(new POS(13, freq));
-					} else if (sn.getLen() == 2) {
-						freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-						sn.addPos(new POS(0, freq));
-						charType = Utility.charType(word);
-						if (charType == Utility.CT_OTHER || charType == Utility.CT_CHINESE) {
-							freq = (double) 1 / (double) (context.getFreq(0, 1) + 1);
-							sn.addPos(new POS(1, freq));
-							freq = (double) 1 / (double) (context.getFreq(0, 2) + 1);
-							sn.addPos(new POS(2, freq));
-							freq = (double) 1 / (double) (context.getFreq(0, 3) + 1);
-							sn.addPos(new POS(3, freq));
-							freq = (double) 1 / (double) (context.getFreq(0, 4) + 1);
-							sn.addPos(new POS(4, freq));
-						}
-						freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
-						sn.addPos(new POS(11, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
-						sn.addPos(new POS(12, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
-						sn.addPos(new POS(13, freq));
-					}
-				}
-				break;
-			case TT_PLACE:
-				freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-				sn.addPos(new POS(0, freq));
+      switch (tagType) {
+      case TT_NORMAL:
+        break;
+      case TT_PERSON:
+        if (word.indexOf("Ã—Ã—") != -1) {
+          freq = (double) 1 / (double) (context.getFreq(0, 6) + 1);
+          sn.addPos(new POS(6, freq));
+        } else {
+          freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
+          sn.addPos(new POS(0, freq));
 
-				if (sn.getLen() >= 4) {
-					freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
-					sn.addPos(new POS(11, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
-					sn.addPos(new POS(12, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
-					sn.addPos(new POS(13, freq));
-				} else if (sn.getLen() == 2) {
-					freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-					sn.addPos(new POS(0, freq));
-					charType = Utility.charType(word);
-					if (charType == Utility.CT_OTHER || charType == Utility.CT_CHINESE) {
+          if (sn.getLen() >= 4) {
+            freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
+            sn.addPos(new POS(0, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
+            sn.addPos(new POS(11, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
+            sn.addPos(new POS(12, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
+            sn.addPos(new POS(13, freq));
+          } else if (sn.getLen() == 2) {
+            freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
+            sn.addPos(new POS(0, freq));
+            charType = Utility.charType(word);
+            if (charType == Utility.CT_OTHER || charType == Utility.CT_CHINESE) {
+              freq = (double) 1 / (double) (context.getFreq(0, 1) + 1);
+              sn.addPos(new POS(1, freq));
+              freq = (double) 1 / (double) (context.getFreq(0, 2) + 1);
+              sn.addPos(new POS(2, freq));
+              freq = (double) 1 / (double) (context.getFreq(0, 3) + 1);
+              sn.addPos(new POS(3, freq));
+              freq = (double) 1 / (double) (context.getFreq(0, 4) + 1);
+              sn.addPos(new POS(4, freq));
+            }
+            freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
+            sn.addPos(new POS(11, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
+            sn.addPos(new POS(12, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
+            sn.addPos(new POS(13, freq));
+          }
+        }
+        break;
+      case TT_PLACE:
+        freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
+        sn.addPos(new POS(0, freq));
 
-						freq = (double) 1 / (double) (context.getFreq(0, 1) + 1);
-						sn.addPos(new POS(1, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 2) + 1);
-						sn.addPos(new POS(2, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 3) + 1);
-						sn.addPos(new POS(3, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 4) + 1);
-						sn.addPos(new POS(4, freq));
-					}
-					freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
-					sn.addPos(new POS(11, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
-					sn.addPos(new POS(12, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
-					sn.addPos(new POS(13, freq));
-				}
-				break;
-			case TT_TRANS_PERSON:
-				freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-				sn.addPos(new POS(0, freq));
-				if (!Utility.isAllChinese(word)) {
-					if (Utility.isAllLetter(word)) {
-						freq = (double) 1 / (double) (context.getFreq(0, 1) + 1);
-						sn.addPos(new POS(1, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 11) + 1);
-						sn.addPos(new POS(11, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 2) * 2 + 1);
-						sn.addPos(new POS(2, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 3) * 2 + 1);
-						sn.addPos(new POS(3, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 12) * 2 + 1);
-						sn.addPos(new POS(12, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 13) * 2 + 1);
-						sn.addPos(new POS(13, freq));
-					}
-					freq = (double) 1 / (double) (context.getFreq(0, 41) * 8);
-					sn.addPos(new POS(41, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 42) * 8);
-					sn.addPos(new POS(42, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 43) * 8);
-					sn.addPos(new POS(43, freq));
-				} else if (sn.getLen() >= 4) {
-					freq = (double) 1 / (double) (context.getFreq(0, 41) * 8);
-					sn.addPos(new POS(41, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 42) * 8);
-					sn.addPos(new POS(42, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 43) * 8);
-					sn.addPos(new POS(43, freq));
-				} else if (sn.getLen() == 2) {
-					charType = Utility.charType(word);
-					if (charType == Utility.CT_OTHER || charType == Utility.CT_CHINESE) {
-						freq = (double) 1 / (double) (context.getFreq(0, 1) * 2 + 1);
-						sn.addPos(new POS(1, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 2) * 2 + 1);
-						sn.addPos(new POS(2, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 3) * 2 + 1);
-						sn.addPos(new POS(3, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 30) * 8 + 1);
-						sn.addPos(new POS(30, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 11) * 4 + 1);
-						sn.addPos(new POS(11, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 12) * 4 + 1);
-						sn.addPos(new POS(12, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 13) * 4 + 1);
-						sn.addPos(new POS(13, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 21) * 2 + 1);
-						sn.addPos(new POS(21, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 22) * 2 + 1);
-						sn.addPos(new POS(22, freq));
-						freq = (double) 1 / (double) (context.getFreq(0, 23) * 2 + 1);
-						sn.addPos(new POS(23, freq));
-					}
-					freq = (double) 1 / (double) (context.getFreq(0, 41) * 8);
-					sn.addPos(new POS(41, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 42) * 8);
-					sn.addPos(new POS(42, freq));
-					freq = (double) 1 / (double) (context.getFreq(0, 43) * 8);
-					sn.addPos(new POS(43, freq));
-				}
-				break;
-			default:
-				break;
-			}
-			if (sn.getAllPos() != null)
-				result = sn.getAllPos().size();
-		}
-		return result;
-	}
+        if (sn.getLen() >= 4) {
+          freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
+          sn.addPos(new POS(11, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
+          sn.addPos(new POS(12, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
+          sn.addPos(new POS(13, freq));
+        } else if (sn.getLen() == 2) {
+          freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
+          sn.addPos(new POS(0, freq));
+          charType = Utility.charType(word);
+          if (charType == Utility.CT_OTHER || charType == Utility.CT_CHINESE) {
 
-	/**
-	 * ÈËÃûÄ£Ê½Æ¥Åä
-	 * 
-	 * <pre>
-	 *          
-	 *          BBCD 343 0.003606 
-	 *          BBC 2 0.000021 
-	 *          BBE 125 0.001314 
-	 *          BBZ 30 0.000315 
-	 *          BCD 62460 0.656624 
-	 *          BEE 0 0.000000 
-	 *          BE 13899 0.146116 
-	 *          BG 869 0.009136 
-	 *          BXD 4 0.000042 
-	 *          BZ 3707 0.038971 
-	 *          CD 8596 0.090367 
-	 *          EE 26 0.000273 
-	 *          FB 871 0.009157 
-	 *          Y 3265 0.034324
-	 *          XD 926 0.009735
-	 *          
-	 *          The person recognition patterns set
-	 *          BBCD:ĞÕ+ĞÕ+Ãû1+Ãû2;
-	 *          BBE: ĞÕ+ĞÕ+µ¥Ãû;
-	 *          BBZ: ĞÕ+ĞÕ+Ë«Ãû³É´Ê;
-	 *          BCD: ĞÕ+Ãû1+Ãû2;
-	 *          BE: ĞÕ+µ¥Ãû;
-	 *          BEE: ĞÕ+µ¥Ãû+µ¥Ãû;º«ÀÚÀÚ
-	 *          BG: ĞÕ+ºó×º
-	 *          BXD: ĞÕ+ĞÕË«ÃûÊ××Ö³É´Ê+Ë«ÃûÄ©×Ö
-	 *          BZ: ĞÕ+Ë«Ãû³É´Ê;
-	 *          B: ĞÕ
-	 *          CD: Ãû1+Ãû2;
-	 *          EE: µ¥Ãû+µ¥Ãû;
-	 *          FB: Ç°×º+ĞÕ
-	 *          XD: ĞÕË«ÃûÊ××Ö³É´Ê+Ë«ÃûÄ©×Ö
-	 *          Y: ĞÕµ¥Ãû³É´Ê
-	 * </pre>
-	 */
-	private void personRecognize(SegGraph segGraph, ArrayList<SegNode> sns) {
-		String sPos = null;
-		String personName = null;
-		// ÈËÃûÊ¶±ğÄ£Ê½
-		final String[] patterns = { "BBCD", "BBC", "BBE", "BBZ", "BCD", "BEE", "BE", "BG", "BXD", "BZ", "CDCD", "CD",
-				"EE", "FB", "Y", "XD", "" };
-		final double[] factor = { 0.003606, 0.000021, 0.001314, 0.000315, 0.656624, 0.000021, 0.146116, 0.009136,
-				0.000042, 0.038971, 0, 0.090367, 0.000273, 0.009157, 0.034324, 0.009735, 0 };
+            freq = (double) 1 / (double) (context.getFreq(0, 1) + 1);
+            sn.addPos(new POS(1, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 2) + 1);
+            sn.addPos(new POS(2, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 3) + 1);
+            sn.addPos(new POS(3, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 4) + 1);
+            sn.addPos(new POS(4, freq));
+          }
+          freq = (double) 1 / (double) (context.getFreq(0, 11) * 8);
+          sn.addPos(new POS(11, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 12) * 8);
+          sn.addPos(new POS(12, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 13) * 8);
+          sn.addPos(new POS(13, freq));
+        }
+        break;
+      case TT_TRANS_PERSON:
+        freq = (double) 1 / (double) (context.getFreq(0, 0) + 1);
+        sn.addPos(new POS(0, freq));
+        if (!Utility.isAllChinese(word)) {
+          if (Utility.isAllLetter(word)) {
+            freq = (double) 1 / (double) (context.getFreq(0, 1) + 1);
+            sn.addPos(new POS(1, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 11) + 1);
+            sn.addPos(new POS(11, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 2) * 2 + 1);
+            sn.addPos(new POS(2, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 3) * 2 + 1);
+            sn.addPos(new POS(3, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 12) * 2 + 1);
+            sn.addPos(new POS(12, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 13) * 2 + 1);
+            sn.addPos(new POS(13, freq));
+          }
+          freq = (double) 1 / (double) (context.getFreq(0, 41) * 8);
+          sn.addPos(new POS(41, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 42) * 8);
+          sn.addPos(new POS(42, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 43) * 8);
+          sn.addPos(new POS(43, freq));
+        } else if (sn.getLen() >= 4) {
+          freq = (double) 1 / (double) (context.getFreq(0, 41) * 8);
+          sn.addPos(new POS(41, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 42) * 8);
+          sn.addPos(new POS(42, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 43) * 8);
+          sn.addPos(new POS(43, freq));
+        } else if (sn.getLen() == 2) {
+          charType = Utility.charType(word);
+          if (charType == Utility.CT_OTHER || charType == Utility.CT_CHINESE) {
+            freq = (double) 1 / (double) (context.getFreq(0, 1) * 2 + 1);
+            sn.addPos(new POS(1, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 2) * 2 + 1);
+            sn.addPos(new POS(2, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 3) * 2 + 1);
+            sn.addPos(new POS(3, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 30) * 8 + 1);
+            sn.addPos(new POS(30, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 11) * 4 + 1);
+            sn.addPos(new POS(11, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 12) * 4 + 1);
+            sn.addPos(new POS(12, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 13) * 4 + 1);
+            sn.addPos(new POS(13, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 21) * 2 + 1);
+            sn.addPos(new POS(21, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 22) * 2 + 1);
+            sn.addPos(new POS(22, freq));
+            freq = (double) 1 / (double) (context.getFreq(0, 23) * 2 + 1);
+            sn.addPos(new POS(23, freq));
+          }
+          freq = (double) 1 / (double) (context.getFreq(0, 41) * 8);
+          sn.addPos(new POS(41, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 42) * 8);
+          sn.addPos(new POS(42, freq));
+          freq = (double) 1 / (double) (context.getFreq(0, 43) * 8);
+          sn.addPos(new POS(43, freq));
+        }
+        break;
+      default:
+        break;
+      }
+      if (sn.getAllPos() != null)
+        result = sn.getAllPos().size();
+    }
+    return result;
+  }
 
-		if (segGraph != null && sns != null) {
-			int j = 1, k, nPos;
-			boolean bMatched = false;
+  /**
+   * äººåæ¨¡å¼åŒ¹é…
+   * 
+   * <pre>
+   * 
+   *          BBCD 343 0.003606 
+   *          BBC 2 0.000021 
+   *          BBE 125 0.001314 
+   *          BBZ 30 0.000315 
+   *          BCD 62460 0.656624 
+   *          BEE 0 0.000000 
+   *          BE 13899 0.146116 
+   *          BG 869 0.009136 
+   *          BXD 4 0.000042 
+   *          BZ 3707 0.038971 
+   *          CD 8596 0.090367 
+   *          EE 26 0.000273 
+   *          FB 871 0.009157 
+   *          Y 3265 0.034324
+   *          XD 926 0.009735
+   *          
+   *          The person recognition patterns set
+   *          BBCD:å§“+å§“+å1+å2;
+   *          BBE: å§“+å§“+å•å;
+   *          BBZ: å§“+å§“+åŒåæˆè¯;
+   *          BCD: å§“+å1+å2;
+   *          BE: å§“+å•å;
+   *          BEE: å§“+å•å+å•å;éŸ©ç£Šç£Š
+   *          BG: å§“+åç¼€
+   *          BXD: å§“+å§“åŒåé¦–å­—æˆè¯+åŒåæœ«å­—
+   *          BZ: å§“+åŒåæˆè¯;
+   *          B: å§“
+   *          CD: å1+å2;
+   *          EE: å•å+å•å;
+   *          FB: å‰ç¼€+å§“
+   *          XD: å§“åŒåé¦–å­—æˆè¯+åŒåæœ«å­—
+   *          Y: å§“å•åæˆè¯
+   * </pre>
+   */
+  private void personRecognize(SegGraph segGraph, ArrayList<SegNode> sns) {
+    String sPos = null;
+    String personName = null;
+    // äººåè¯†åˆ«æ¨¡å¼
+    final String[] patterns = { "BBCD", "BBC", "BBE", "BBZ", "BCD", "BEE", "BE", "BG", "BXD", "BZ",
+        "CDCD", "CD", "EE", "FB", "Y", "XD", "" };
+    final double[] factor = { 0.003606, 0.000021, 0.001314, 0.000315, 0.656624, 0.000021, 0.146116,
+        0.009136, 0.000042, 0.038971, 0, 0.090367, 0.000273, 0.009157, 0.034324, 0.009735, 0 };
 
-			sPos = word2pattern(sns);
-			while (sPos != null && j < sPos.length()) {
-				bMatched = false;
-				for (k = 0; !bMatched && patterns[k].length() > 0; k++) {
-					// Èç¹ûµ±Ç°¾ä×ÓÖĞÓĞ·ûºÏ¸ÃÄ£Ê½µÄ×Ö´®£¬²¢ÇÒ¸Ã×Ö´®Ç°ºó¶¼²»ÊÇÔ²µã£¬ÔòÈÏÎªÊÇÆ¥ÅäµÄ
-					if (sPos.substring(j).indexOf(patterns[k]) == 0 && !"¡¤".equals(sns.get(j - 1).getWord())
-							&& !"¡¤".equals(sns.get(j + patterns[k].length()))) {// Find
+    if (segGraph != null && sns != null) {
+      int j = 1, k, nPos;
+      boolean bMatched = false;
 
-						String temp = sPos.substring(j + 2);
-						if (temp.length() > 1)
-							temp = temp.substring(0, 1);
+      sPos = word2pattern(sns);
+      while (sPos != null && j < sPos.length()) {
+        bMatched = false;
+        for (k = 0; !bMatched && patterns[k].length() > 0; k++) {
+          // å¦‚æœå½“å‰å¥å­ä¸­æœ‰ç¬¦åˆè¯¥æ¨¡å¼çš„å­—ä¸²ï¼Œå¹¶ä¸”è¯¥å­—ä¸²å‰åéƒ½ä¸æ˜¯åœ†ç‚¹ï¼Œåˆ™è®¤ä¸ºæ˜¯åŒ¹é…çš„
+          if (sPos.substring(j).indexOf(patterns[k]) == 0 && !"Â·".equals(sns.get(j - 1).getWord())
+              && !"Â·".equals(sns.get(j + patterns[k].length()))) {// Find
 
-						// Rule 1 for exclusion:Ç°×º+ĞÕ+Ãû1(Ãû2): ¹æÔò(Ç°×º+ĞÕ)Ê§Ğ§£»
-						if ("FB".equals(patterns[k]) && ("E".equals(temp) || "C".equals(temp) || "G".equals(temp))) {
-							continue;
-						}
+            String temp = sPos.substring(j + 2);
+            if (temp.length() > 1)
+              temp = temp.substring(0, 1);
 
-						nPos = j;
-						personName = "";
-						// Get the possible person name
-						while (nPos < j + patterns[k].length()) {
-							SegNode sn = sns.get(nPos);
-							if (sn.getPos() < 4
-									&& unknownDict.getFreq(sn.getWord(), sn.getPos()) < Utility.LITTLE_FREQUENCY)
-								personName += sn.getWord();
-							nPos += 1;
-						}
-						if ("CDCD".equals(patterns[k])) {
-							if (GetForeignCharCount(personName) > 0)
-								j += patterns[k].length() - 1;
-							continue;
-						}
+            // Rule 1 for exclusion:å‰ç¼€+å§“+å1(å2): è§„åˆ™(å‰ç¼€+å§“)å¤±æ•ˆï¼›
+            if ("FB".equals(patterns[k])
+                && ("E".equals(temp) || "C".equals(temp) || "G".equals(temp))) {
+              continue;
+            }
 
-						SegNode usn = new SegNode();
-						usn.setRow(sns.get(j).getRow());
-						usn.setCol(sns.get(j + patterns[k].length() - 1).getCol());
-						usn.setWord(unknownFlags);
-						usn.setSrcWord(personName);
-						double value = -Math.log(factor[k]) + computePossibility(j, patterns[k].length(), sns);
-						usn.setPos(pos);
-						usn.setValue(value);
-						segGraph.insert(usn, true);
+            nPos = j;
+            personName = "";
+            // Get the possible person name
+            while (nPos < j + patterns[k].length()) {
+              SegNode sn = sns.get(nPos);
+              if (sn.getPos() < 4
+                  && unknownDict.getFreq(sn.getWord(), sn.getPos()) < Utility.LITTLE_FREQUENCY)
+                personName += sn.getWord();
+              nPos += 1;
+            }
+            if ("CDCD".equals(patterns[k])) {
+              if (GetForeignCharCount(personName) > 0)
+                j += patterns[k].length() - 1;
+              continue;
+            }
 
-						j += patterns[k].length();
-						bMatched = true;
-					}
-				}
-				if (!bMatched)// Not matched, add j by 1
-					j += 1;
-			}
+            SegNode usn = new SegNode();
+            usn.setRow(sns.get(j).getRow());
+            usn.setCol(sns.get(j + patterns[k].length() - 1).getCol());
+            usn.setWord(unknownFlags);
+            usn.setSrcWord(personName);
+            double value = -Math.log(factor[k]) + computePossibility(j, patterns[k].length(), sns);
+            usn.setPos(pos);
+            usn.setValue(value);
+            segGraph.insert(usn, true);
 
-		}
-	}
+            j += patterns[k].length();
+            bMatched = true;
+          }
+        }
+        if (!bMatched)// Not matched, add j by 1
+          j += 1;
+      }
 
-	// TODO:
-	private int GetForeignCharCount(String personName) {
-		return 0;
-	}
+    }
+  }
 
-	/**
-	 * µØÃûÄ£Ê½Æ¥Åä
-	 * 
-	 */
-	private void placeRecognize(SegGraph segGraph, ArrayList<SegNode> sns, Dictionary coreDict) {
-		if (segGraph != null && coreDict != null) {
-			int start = 1;
-			int end = 1;
-			double dPanelty = 1;
-			String srcWord = "";
-			for (int i = 1; i < sns.size(); i++) {
-				start = i;
-				end = start;
-				srcWord = sns.get(i).getSrcWord();
-				if (getBestTag(sns, i) == 1) {
-					for (end = i + 1; end < sns.size(); end++) {
-						int bestTag = getBestTag(sns, end);
-						if (bestTag == -1)
-							continue;
-						else if (bestTag == 1 || bestTag == 3) {
-							if (end > i + 1)
-								dPanelty += 1;
-							srcWord += sns.get(end).getSrcWord();
-						} else if (bestTag == 2)
-							srcWord += sns.get(end).getSrcWord();
-						else
-							break;
-					}
+  // TODO:
+  private int GetForeignCharCount(String personName) {
+    return 0;
+  }
 
-				} else if (getBestTag(sns, i) == 2) {
-					dPanelty += 1;
-					for (end = i + 1; end < sns.size(); end++) {
-						int bestTag = getBestTag(sns, end);
-						if (bestTag == -1)
-							continue;
-						else if (bestTag == 3) {
-							if (end > i + 1)
-								dPanelty += 1;
-							srcWord += sns.get(end).getSrcWord();
-						} else if (bestTag == 2)
-							srcWord += sns.get(end).getSrcWord();
-						else
-							break;
-					}
-				}
-				if (end > start) {
-					SegNode newsn = new SegNode();
-					newsn.setRow(sns.get(start).getRow());
-					newsn.setCol(sns.get(end - 1).getCol());
-					newsn.setPos(pos);
-					newsn.setWord(unknownFlags);
-					newsn.setSrcWord(srcWord);
-					double value = computePossibility(start, end - start + 1, sns);
-					newsn.setValue(value);
-					segGraph.insert(newsn, true);
-				}
-			}
-		}
-	}
+  /**
+   * åœ°åæ¨¡å¼åŒ¹é…
+   * 
+   */
+  private void placeRecognize(SegGraph segGraph, ArrayList<SegNode> sns, Dictionary coreDict) {
+    if (segGraph != null && coreDict != null) {
+      int start = 1;
+      int end = 1;
+      double dPanelty = 1;
+      String srcWord = "";
+      for (int i = 1; i < sns.size(); i++) {
+        start = i;
+        end = start;
+        srcWord = sns.get(i).getSrcWord();
+        if (getBestTag(sns, i) == 1) {
+          for (end = i + 1; end < sns.size(); end++) {
+            int bestTag = getBestTag(sns, end);
+            if (bestTag == -1)
+              continue;
+            else if (bestTag == 1 || bestTag == 3) {
+              if (end > i + 1)
+                dPanelty += 1;
+              srcWord += sns.get(end).getSrcWord();
+            } else if (bestTag == 2)
+              srcWord += sns.get(end).getSrcWord();
+            else
+              break;
+          }
 
-	private int getBestTag(ArrayList<SegNode> sns, int index) {
-		if (sns != null && index >= 0 && index < sns.size()) {
-			SegNode sn = sns.get(index);
-			return getBestTag(sn);
+        } else if (getBestTag(sns, i) == 2) {
+          dPanelty += 1;
+          for (end = i + 1; end < sns.size(); end++) {
+            int bestTag = getBestTag(sns, end);
+            if (bestTag == -1)
+              continue;
+            else if (bestTag == 3) {
+              if (end > i + 1)
+                dPanelty += 1;
+              srcWord += sns.get(end).getSrcWord();
+            } else if (bestTag == 2)
+              srcWord += sns.get(end).getSrcWord();
+            else
+              break;
+          }
+        }
+        if (end > start) {
+          SegNode newsn = new SegNode();
+          newsn.setRow(sns.get(start).getRow());
+          newsn.setCol(sns.get(end - 1).getCol());
+          newsn.setPos(pos);
+          newsn.setWord(unknownFlags);
+          newsn.setSrcWord(srcWord);
+          double value = computePossibility(start, end - start + 1, sns);
+          newsn.setValue(value);
+          segGraph.insert(newsn, true);
+        }
+      }
+    }
+  }
 
-		}
+  private int getBestTag(ArrayList<SegNode> sns, int index) {
+    if (sns != null && index >= 0 && index < sns.size()) {
+      SegNode sn = sns.get(index);
+      return getBestTag(sn);
 
-		return -1;
-	}
+    }
 
-	private int getBestTag(SegNode sn) {
-		if (sn != null) {
-			ArrayList<POS> allPos = sn.getAllPos();
-			if (allPos != null) {
-				for (POS pos : allPos) {
-					if (pos.isBest())
-						return pos.getTag();
-				}
-			}
-		}
+    return -1;
+  }
 
-		return -1;
-	}
+  private int getBestTag(SegNode sn) {
+    if (sn != null) {
+      ArrayList<POS> allPos = sn.getAllPos();
+      if (allPos != null) {
+        for (POS pos : allPos) {
+          if (pos.isBest())
+            return pos.getTag();
+        }
+      }
+    }
 
-	// Judge whether the name is a given name
-	public boolean isGivenName(String sName) {
-		String firstChar;
-		String secondChar;
-		// given Name Possibility
-		double gnp = 0;
-		// singleNamePossibility
-		double snp = 0;
+    return -1;
+  }
 
-		if (sName != null) {
-			if (sName.getBytes().length != 4)
-				return false;
+  // Judge whether the name is a given name
+  public boolean isGivenName(String sName) {
+    String firstChar;
+    String secondChar;
+    // given Name Possibility
+    double gnp = 0;
+    // singleNamePossibility
+    double snp = 0;
 
-			firstChar = sName.substring(0, 1);
-			secondChar = sName.substring(1);
-
-			// The possibility of P(Wi|Ti)
-			gnp += Math.log((double) unknownDict.getFreq(firstChar, 2) + 1.0);
-			gnp -= Math.log(context.getFreq(0, 2) + 1.0);
-			gnp += Math.log((double) unknownDict.getFreq(secondChar, 3) + 1.0);
-			gnp -= Math.log(context.getFreq(0, 3) + 1.0);
-			// The possibility of conversion from 2 to 3
-			gnp += Math.log(context.getPossibility(0, 2, 3) + 1.0);
-			gnp -= Math.log(context.getFreq(0, 2) + 1.0);
-
-			// The possibility of P(Wi|Ti)
-			snp += Math.log((double) unknownDict.getFreq(firstChar, 1) + 1.0);
-			snp -= Math.log(context.getFreq(0, 1) + 1.0);
-			snp += Math.log((double) unknownDict.getFreq(secondChar, 4) + 1.0);
-			snp -= Math.log(context.getFreq(0, 4) + 1.0);
-			// The possibility of conversion from 1 to 4
-			snp += Math.log(context.getPossibility(0, 1, 4) + 1.0);
-			snp -= Math.log(context.getFreq(0, 1) + 1.0);
-
-			// ÕÅÕğ||m_dict.getFrequency(sFirstChar,1)/m_dict.getFrequency(sFirstChar,2)>=10
-			// The possibility being a single given name is more than being a
-			// 2-char given name
-			if (snp >= gnp)
-				return false;
-			return true;
-		}
-
-		return false;
-	}
-
-	// °Ñ¾­¹ı³õ´Î·Ö´ÊºóµÄÁ´±íĞÎÊ½×ª³ÉÈËÃû×Ö·û´®Ä£Ê½
-	private String word2pattern(ArrayList<SegNode> sns) {
-		String result = null;
-
-		if (sns != null) {
-			result = "";
-			for (SegNode sn : sns) {
-				result += (char) (getBestTag(sn) + 'A');
+    if (sName != null) {
+      try {
+				if (sName.getBytes("GBK").length != 4)
+				  return false;
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				if (sName.getBytes().length != 4)
+				  return false;
 			}
 
-		}
-		return result;
-	}
- 
-	/**
-	 * ±ê¼Ç³ö×î¼Ñ´ÊĞÔ
-	 * 
-	 * @param sns
-	 */
-	private void tagBest(ArrayList<SegNode> sns) {
+      firstChar = sName.substring(0, 1);
+      secondChar = sName.substring(1);
 
-		if (sns != null) {
-			int size = sns.size();
+      // The possibility of P(Wi|Ti)
+      gnp += Math.log((double) unknownDict.getFreq(firstChar, 2) + 1.0);
+      gnp -= Math.log(context.getFreq(0, 2) + 1.0);
+      gnp += Math.log((double) unknownDict.getFreq(secondChar, 3) + 1.0);
+      gnp -= Math.log(context.getFreq(0, 3) + 1.0);
+      // The possibility of conversion from 2 to 3
+      gnp += Math.log(context.getPossibility(0, 2, 3) + 1.0);
+      gnp -= Math.log(context.getFreq(0, 2) + 1.0);
 
-			// ²»¿¼ÂÇ¿ªÊ¼ºÍ½áÊø±ê¼Ç
-			for (int i = size - 1, j = 0; i >= 0; i--) {
-				ArrayList<POS> allPos = sns.get(i).getAllPos();
-				if (allPos != null && allPos.size() > j) {
-					POS pos = allPos.get(j);
-					pos.setBest(true);
-					j = pos.getPrev();
-				} else if (i + 1 < size - 1) {
-					int tag = getBestTag(sns.get(i + 1));
-					POS pos = new POS(tag, 0);
-					pos.setBest(true);
-					sns.get(i).addPos(pos);
-				}
-			}
-			// °Ñ½áÊøµãÈ¥µô£¬ÓÃµ½ËüµÄÄ¿µÄ½ö½öÊÇÎªÁËµÃµ½×îºóÒ»¸ö¡°Ä©££££Ä©¡±´ÊµÄ×îÓÅ´ÊĞÔ
+      // The possibility of P(Wi|Ti)
+      snp += Math.log((double) unknownDict.getFreq(firstChar, 1) + 1.0);
+      snp -= Math.log(context.getFreq(0, 1) + 1.0);
+      snp += Math.log((double) unknownDict.getFreq(secondChar, 4) + 1.0);
+      snp -= Math.log(context.getFreq(0, 4) + 1.0);
+      // The possibility of conversion from 1 to 4
+      snp += Math.log(context.getPossibility(0, 1, 4) + 1.0);
+      snp -= Math.log(context.getFreq(0, 1) + 1.0);
 
-			if (size > 1) {
-				if (sns.get(size - 1).getWord() == null)
-					sns.remove(size - 1);
-			}
-		}
-	}
+      // å¼ éœ‡||m_dict.getFrequency(sFirstChar,1)/m_dict.getFrequency(sFirstChar,2)>=10
+      // The possibility being a single given name is more than being a
+      // 2-char given name
+      if (snp >= gnp)
+        return false;
+      return true;
+    }
 
-	private double computePossibility(int startPos, int length, ArrayList<SegNode> sns) {
-		double retValue = 0, posPoss;
+    return false;
+  }
 
-		if (sns != null && unknownDict != null && context != null) {
-			for (int i = startPos; i < startPos + length && sns != null; i++) {
-				SegNode sn = sns.get(i);
-				int bestTag = getBestTag(sn);
-				if (bestTag != -1) {
-					int freq = unknownDict.getFreq(sn.getSrcWord(), bestTag);
-					posPoss = Math.log((double) (context.getFreq(0, sn.getPos()) + 1));
-					posPoss += -Math.log((double) (freq + 1));
-					retValue += posPoss;
-				}
-			}
-		}
-		return retValue;
-	}
+  // æŠŠç»è¿‡åˆæ¬¡åˆ†è¯åçš„é“¾è¡¨å½¢å¼è½¬æˆäººåå­—ç¬¦ä¸²æ¨¡å¼
+  private String word2pattern(ArrayList<SegNode> sns) {
+    String result = null;
 
-	public Dictionary getUnknownDict() {
-		return unknownDict;
-	}
+    if (sns != null) {
+      result = "";
+      for (SegNode sn : sns) {
+        result += (char) (getBestTag(sn) + 'A');
+      }
+
+    }
+    return result;
+  }
+
+  /**
+   * æ ‡è®°å‡ºæœ€ä½³è¯æ€§
+   * 
+   * @param sns
+   */
+  private void tagBest(ArrayList<SegNode> sns) {
+
+    if (sns != null) {
+      int size = sns.size();
+
+      // ä¸è€ƒè™‘å¼€å§‹å’Œç»“æŸæ ‡è®°
+      for (int i = size - 1, j = 0; i >= 0; i--) {
+        ArrayList<POS> allPos = sns.get(i).getAllPos();
+        if (allPos != null && allPos.size() > j) {
+          POS pos = allPos.get(j);
+          pos.setBest(true);
+          j = pos.getPrev();
+        } else if (i + 1 < size - 1) {
+          int tag = getBestTag(sns.get(i + 1));
+          POS pos = new POS(tag, 0);
+          pos.setBest(true);
+          sns.get(i).addPos(pos);
+        }
+      }
+      // æŠŠç»“æŸç‚¹å»æ‰ï¼Œç”¨åˆ°å®ƒçš„ç›®çš„ä»…ä»…æ˜¯ä¸ºäº†å¾—åˆ°æœ€åä¸€ä¸ªâ€œæœ«ï¼ƒï¼ƒæœ«â€è¯çš„æœ€ä¼˜è¯æ€§
+
+      if (size > 1) {
+        if (sns.get(size - 1).getWord() == null)
+          sns.remove(size - 1);
+      }
+    }
+  }
+
+  private double computePossibility(int startPos, int length, ArrayList<SegNode> sns) {
+    double retValue = 0, posPoss;
+
+    if (sns != null && unknownDict != null && context != null) {
+      for (int i = startPos; i < startPos + length && sns != null; i++) {
+        SegNode sn = sns.get(i);
+        int bestTag = getBestTag(sn);
+        if (bestTag != -1) {
+          int freq = unknownDict.getFreq(sn.getSrcWord(), bestTag);
+          posPoss = Math.log((double) (context.getFreq(0, sn.getPos()) + 1));
+          posPoss += -Math.log((double) (freq + 1));
+          retValue += posPoss;
+        }
+      }
+    }
+    return retValue;
+  }
+
+  public Dictionary getUnknownDict() {
+    return unknownDict;
+  }
 
 }

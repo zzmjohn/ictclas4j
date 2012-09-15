@@ -6,49 +6,478 @@
  */
 package org.ictclas4j.utility;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+
 /**
- * ºÍ×Ö·û´®Ïà¹ØµÄ³£ÓÃ²Ù×÷
+ * å’Œå­—ç¬¦ä¸²ç›¸å…³çš„å¸¸ç”¨æ“ä½œ
  * 
  * @author SINBOY
  * @version V1.1
  */
 public class GFString {
+	private static final HashMap<String, String> map_hex2bin = new HashMap<String, String>(16); 
+	{
+		map_hex2bin.put("0", "0000");
+		map_hex2bin.put("1", "0001");
+		map_hex2bin.put("2", "0010");
+		map_hex2bin.put("3", "0011");
+		map_hex2bin.put("4", "0100");
+		map_hex2bin.put("5", "0101");
+		map_hex2bin.put("6", "0110");
+		map_hex2bin.put("7", "0111");
+		map_hex2bin.put("8", "1000");
+		map_hex2bin.put("9", "1001");
+		map_hex2bin.put("A", "1010");
+		map_hex2bin.put("B", "1011");
+		map_hex2bin.put("C", "1100");
+		map_hex2bin.put("D", "1101");
+		map_hex2bin.put("E", "1110");
+		map_hex2bin.put("F", "1111");		
+	}
+	
+	public final static HashMap<String, String> map_bin2hex = new HashMap<String, String>(16);
+	{
+		map_bin2hex.put("0000", "0");
+		map_bin2hex.put("0001", "1");
+		map_bin2hex.put("0010", "2");
+		map_bin2hex.put("0011", "3");
+		map_bin2hex.put("0100", "4");
+		map_bin2hex.put("0101", "5");
+		map_bin2hex.put("0110", "6");
+		map_bin2hex.put("0111", "7");
+		map_bin2hex.put("1000", "8");
+		map_bin2hex.put("1001", "9");
+		map_bin2hex.put("1010", "A");
+		map_bin2hex.put("1011", "B");
+		map_bin2hex.put("1100", "C");
+		map_bin2hex.put("1101", "D");
+		map_bin2hex.put("1110", "E");
+		map_bin2hex.put("1111", "F");
+	}
 
+	private final static LinkedHashMap<String, Integer> bopoMap = new LinkedHashMap<String, Integer>();
+	{
+		bopoMap.put("a", 1);	
+		bopoMap.put("a", -20319);
+		bopoMap.put("ai", -20317);
+		bopoMap.put("an", -20304);
+		bopoMap.put("ang", -20295);
+		bopoMap.put("ao", -20292);
+		bopoMap.put("ba", -20283);
+		bopoMap.put("bai", -20265);
+		bopoMap.put("ban", -20257);
+		bopoMap.put("bang", -20242);
+		bopoMap.put("bao", -20230);
+		bopoMap.put("bei", -20051);
+		bopoMap.put("ben", -20036);
+		bopoMap.put("beng", -20032);
+		bopoMap.put("bi", -20026);
+		bopoMap.put("bian", -20002);
+		bopoMap.put("biao", -19990);
+		bopoMap.put("bie", -19986);
+		bopoMap.put("bin", -19982);
+		bopoMap.put("bing", -19976);
+		bopoMap.put("bo", -19805);
+		bopoMap.put("bu", -19784);
+		bopoMap.put("ca", -19775);
+		bopoMap.put("cai", -19774);
+		bopoMap.put("can", -19763);
+		bopoMap.put("cang", -19756);
+		bopoMap.put("cao", -19751);
+		bopoMap.put("ce", -19746);
+		bopoMap.put("ceng", -19741);
+		bopoMap.put("cha", -19739);
+		bopoMap.put("chai", -19728);
+		bopoMap.put("chan", -19725);
+		bopoMap.put("chang", -19715);
+		bopoMap.put("chao", -19540);
+		bopoMap.put("che", -19531);
+		bopoMap.put("chen", -19525);
+		bopoMap.put("cheng", -19515);
+		bopoMap.put("chi", -19500);
+		bopoMap.put("chong", -19484);
+		bopoMap.put("chou", -19479);
+		bopoMap.put("chu", -19467);
+		bopoMap.put("chuai", -19289);
+		bopoMap.put("chuan", -19288);
+		bopoMap.put("chuang", -19281);
+		bopoMap.put("chui", -19275);
+		bopoMap.put("chun", -19270);
+		bopoMap.put("chuo", -19263);
+		bopoMap.put("ci", -19261);
+		bopoMap.put("cong", -19249);
+		bopoMap.put("cou", -19243);
+		bopoMap.put("cu", -19242);
+		bopoMap.put("cuan", -19238);
+		bopoMap.put("cui", -19235);
+		bopoMap.put("cun", -19227);
+		bopoMap.put("cuo", -19224);
+		bopoMap.put("da", -19218);
+		bopoMap.put("dai", -19212);
+		bopoMap.put("dan", -19038);
+		bopoMap.put("dang", -19023);
+		bopoMap.put("dao", -19018);
+		bopoMap.put("de", -19006);
+		bopoMap.put("deng", -19003);
+		bopoMap.put("di", -18996);
+		bopoMap.put("dian", -18977);
+		bopoMap.put("diao", -18961);
+		bopoMap.put("die", -18952);
+		bopoMap.put("ding", -18783);
+		bopoMap.put("diu", -18774);
+		bopoMap.put("dong", -18773);
+		bopoMap.put("dou", -18763);
+		bopoMap.put("du", -18756);
+		bopoMap.put("duan", -18741);
+		bopoMap.put("dui", -18735);
+		bopoMap.put("dun", -18731);
+		bopoMap.put("duo", -18722);
+		bopoMap.put("e", -18710);
+		bopoMap.put("en", -18697);
+		bopoMap.put("er", -18696);
+		bopoMap.put("fa", -18526);
+		bopoMap.put("fan", -18518);
+		bopoMap.put("fang", -18501);
+		bopoMap.put("fei", -18490);
+		bopoMap.put("fen", -18478);
+		bopoMap.put("feng", -18463);
+		bopoMap.put("fo", -18448);
+		bopoMap.put("fou", -18447);
+		bopoMap.put("fu", -18446);
+		bopoMap.put("ga", -18239);
+		bopoMap.put("gai", -18237);
+		bopoMap.put("gan", -18231);
+		bopoMap.put("gang", -18220);
+		bopoMap.put("gao", -18211);
+		bopoMap.put("ge", -18201);
+		bopoMap.put("gei", -18184);
+		bopoMap.put("gen", -18183);
+		bopoMap.put("geng", -18181);
+		bopoMap.put("gong", -18012);
+		bopoMap.put("gou", -17997);
+		bopoMap.put("gu", -17988);
+		bopoMap.put("gua", -17970);
+		bopoMap.put("guai", -17964);
+		bopoMap.put("guan", -17961);
+		bopoMap.put("guang", -17950);
+		bopoMap.put("gui", -17947);
+		bopoMap.put("gun", -17931);
+		bopoMap.put("guo", -17928);
+		bopoMap.put("ha", -17922);
+		bopoMap.put("hai", -17759);
+		bopoMap.put("han", -17752);
+		bopoMap.put("hang", -17733);
+		bopoMap.put("hao", -17730);
+		bopoMap.put("he", -17721);
+		bopoMap.put("hei", -17703);
+		bopoMap.put("hen", -17701);
+		bopoMap.put("heng", -17697);
+		bopoMap.put("hong", -17692);
+		bopoMap.put("hou", -17683);
+		bopoMap.put("hu", -17676);
+		bopoMap.put("hua", -17496);
+		bopoMap.put("huai", -17487);
+		bopoMap.put("huan", -17482);
+		bopoMap.put("huang", -17468);
+		bopoMap.put("hui", -17454);
+		bopoMap.put("hun", -17433);
+		bopoMap.put("huo", -17427);
+		bopoMap.put("ji", -17417);
+		bopoMap.put("jia", -17202);
+		bopoMap.put("jian", -17185);
+		bopoMap.put("jiang", -16983);
+		bopoMap.put("jiao", -16970);
+		bopoMap.put("jie", -16942);
+		bopoMap.put("jin", -16915);
+		bopoMap.put("jing", -16733);
+		bopoMap.put("jiong", -16708);
+		bopoMap.put("jiu", -16706);
+		bopoMap.put("ju", -16689);
+		bopoMap.put("juan", -16664);
+		bopoMap.put("jue", -16657);
+		bopoMap.put("jun", -16647);
+		bopoMap.put("ka", -16474);
+		bopoMap.put("kai", -16470);
+		bopoMap.put("kan", -16465);
+		bopoMap.put("kang", -16459);
+		bopoMap.put("kao", -16452);
+		bopoMap.put("ke", -16448);
+		bopoMap.put("ken", -16433);
+		bopoMap.put("keng", -16429);
+		bopoMap.put("kong", -16427);
+		bopoMap.put("kou", -16423);
+		bopoMap.put("ku", -16419);
+		bopoMap.put("kua", -16412);
+		bopoMap.put("kuai", -16407);
+		bopoMap.put("kuan", -16403);
+		bopoMap.put("kuang", -16401);
+		bopoMap.put("kui", -16393);
+		bopoMap.put("kun", -16220);
+		bopoMap.put("kuo", -16216);
+		bopoMap.put("la", -16212);
+		bopoMap.put("lai", -16205);
+		bopoMap.put("lan", -16202);
+		bopoMap.put("lang", -16187);
+		bopoMap.put("lao", -16180);
+		bopoMap.put("le", -16171);
+		bopoMap.put("lei", -16169);
+		bopoMap.put("leng", -16158);
+		bopoMap.put("li", -16155);
+		bopoMap.put("lia", -15959);
+		bopoMap.put("lian", -15958);
+		bopoMap.put("liang", -15944);
+		bopoMap.put("liao", -15933);
+		bopoMap.put("lie", -15920);
+		bopoMap.put("lin", -15915);
+		bopoMap.put("ling", -15903);
+		bopoMap.put("liu", -15889);
+		bopoMap.put("long", -15878);
+		bopoMap.put("lou", -15707);
+		bopoMap.put("lu", -15701);
+		bopoMap.put("lv", -15681);
+		bopoMap.put("luan", -15667);
+		bopoMap.put("lue", -15661);
+		bopoMap.put("lun", -15659);
+		bopoMap.put("luo", -15652);
+		bopoMap.put("ma", -15640);
+		bopoMap.put("mai", -15631);
+		bopoMap.put("man", -15625);
+		bopoMap.put("mang", -15454);
+		bopoMap.put("mao", -15448);
+		bopoMap.put("me", -15436);
+		bopoMap.put("mei", -15435);
+		bopoMap.put("men", -15419);
+		bopoMap.put("meng", -15416);
+		bopoMap.put("mi", -15408);
+		bopoMap.put("mian", -15394);
+		bopoMap.put("miao", -15385);
+		bopoMap.put("mie", -15377);
+		bopoMap.put("min", -15375);
+		bopoMap.put("ming", -15369);
+		bopoMap.put("miu", -15363);
+		bopoMap.put("mo", -15362);
+		bopoMap.put("mou", -15183);
+		bopoMap.put("mu", -15180);
+		bopoMap.put("na", -15165);
+		bopoMap.put("nai", -15158);
+		bopoMap.put("nan", -15153);
+		bopoMap.put("nang", -15150);
+		bopoMap.put("nao", -15149);
+		bopoMap.put("ne", -15144);
+		bopoMap.put("nei", -15143);
+		bopoMap.put("nen", -15141);
+		bopoMap.put("neng", -15140);
+		bopoMap.put("ni", -15139);
+		bopoMap.put("nian", -15128);
+		bopoMap.put("niang", -15121);
+		bopoMap.put("niao", -15119);
+		bopoMap.put("nie", -15117);
+		bopoMap.put("nin", -15110);
+		bopoMap.put("ning", -15109);
+		bopoMap.put("niu", -14941);
+		bopoMap.put("nong", -14937);
+		bopoMap.put("nu", -14933);
+		bopoMap.put("nv", -14930);
+		bopoMap.put("nuan", -14929);
+		bopoMap.put("nue", -14928);
+		bopoMap.put("nuo", -14926);
+		bopoMap.put("o", -14922);
+		bopoMap.put("ou", -14921);
+		bopoMap.put("pa", -14914);
+		bopoMap.put("pai", -14908);
+		bopoMap.put("pan", -14902);
+		bopoMap.put("pang", -14894);
+		bopoMap.put("pao", -14889);
+		bopoMap.put("pei", -14882);
+		bopoMap.put("pen", -14873);
+		bopoMap.put("peng", -14871);
+		bopoMap.put("pi", -14857);
+		bopoMap.put("pian", -14678);
+		bopoMap.put("piao", -14674);
+		bopoMap.put("pie", -14670);
+		bopoMap.put("pin", -14668);
+		bopoMap.put("ping", -14663);
+		bopoMap.put("po", -14654);
+		bopoMap.put("pu", -14645);
+		bopoMap.put("qi", -14630);
+		bopoMap.put("qia", -14594);
+		bopoMap.put("qian", -14429);
+		bopoMap.put("qiang", -14407);
+		bopoMap.put("qiao", -14399);
+		bopoMap.put("qie", -14384);
+		bopoMap.put("qin", -14379);
+		bopoMap.put("qing", -14368);
+		bopoMap.put("qiong", -14355);
+		bopoMap.put("qiu", -14353);
+		bopoMap.put("qu", -14345);
+		bopoMap.put("quan", -14170);
+		bopoMap.put("que", -14159);
+		bopoMap.put("qun", -14151);
+		bopoMap.put("ran", -14149);
+		bopoMap.put("rang", -14145);
+		bopoMap.put("rao", -14140);
+		bopoMap.put("re", -14137);
+		bopoMap.put("ren", -14135);
+		bopoMap.put("reng", -14125);
+		bopoMap.put("ri", -14123);
+		bopoMap.put("rong", -14122);
+		bopoMap.put("rou", -14112);
+		bopoMap.put("ru", -14109);
+		bopoMap.put("ruan", -14099);
+		bopoMap.put("rui", -14097);
+		bopoMap.put("run", -14094);
+		bopoMap.put("ruo", -14092);
+		bopoMap.put("sa", -14090);
+		bopoMap.put("sai", -14087);
+		bopoMap.put("san", -14083);
+		bopoMap.put("sang", -13917);
+		bopoMap.put("sao", -13914);
+		bopoMap.put("se", -13910);
+		bopoMap.put("sen", -13907);
+		bopoMap.put("seng", -13906);
+		bopoMap.put("sha", -13905);
+		bopoMap.put("shai", -13896);
+		bopoMap.put("shan", -13894);
+		bopoMap.put("shang", -13878);
+		bopoMap.put("shao", -13870);
+		bopoMap.put("she", -13859);
+		bopoMap.put("shen", -13847);
+		bopoMap.put("sheng", -13831);
+		bopoMap.put("shi", -13658);
+		bopoMap.put("shou", -13611);
+		bopoMap.put("shu", -13601);
+		bopoMap.put("shua", -13406);
+		bopoMap.put("shuai", -13404);
+		bopoMap.put("shuan", -13400);
+		bopoMap.put("shuang", -13398);
+		bopoMap.put("shui", -13395);
+		bopoMap.put("shun", -13391);
+		bopoMap.put("shuo", -13387);
+		bopoMap.put("si", -13383);
+		bopoMap.put("song", -13367);
+		bopoMap.put("sou", -13359);
+		bopoMap.put("su", -13356);
+		bopoMap.put("suan", -13343);
+		bopoMap.put("sui", -13340);
+		bopoMap.put("sun", -13329);
+		bopoMap.put("suo", -13326);
+		bopoMap.put("ta", -13318);
+		bopoMap.put("tai", -13147);
+		bopoMap.put("tan", -13138);
+		bopoMap.put("tang", -13120);
+		bopoMap.put("tao", -13107);
+		bopoMap.put("te", -13096);
+		bopoMap.put("teng", -13095);
+		bopoMap.put("ti", -13091);
+		bopoMap.put("tian", -13076);
+		bopoMap.put("tiao", -13068);
+		bopoMap.put("tie", -13063);
+		bopoMap.put("ting", -13060);
+		bopoMap.put("tong", -12888);
+		bopoMap.put("tou", -12875);
+		bopoMap.put("tu", -12871);
+		bopoMap.put("tuan", -12860);
+		bopoMap.put("tui", -12858);
+		bopoMap.put("tun", -12852);
+		bopoMap.put("tuo", -12849);
+		bopoMap.put("wa", -12838);
+		bopoMap.put("wai", -12831);
+		bopoMap.put("wan", -12829);
+		bopoMap.put("wang", -12812);
+		bopoMap.put("wei", -12802);
+		bopoMap.put("wen", -12607);
+		bopoMap.put("weng", -12597);
+		bopoMap.put("wo", -12594);
+		bopoMap.put("wu", -12585);
+		bopoMap.put("xi", -12556);
+		bopoMap.put("xia", -12359);
+		bopoMap.put("xian", -12346);
+		bopoMap.put("xiang", -12320);
+		bopoMap.put("xiao", -12300);
+		bopoMap.put("xie", -12120);
+		bopoMap.put("xin", -12099);
+		bopoMap.put("xing", -12089);
+		bopoMap.put("xiong", -12074);
+		bopoMap.put("xiu", -12067);
+		bopoMap.put("xu", -12058);
+		bopoMap.put("xuan", -12039);
+		bopoMap.put("xue", -11867);
+		bopoMap.put("xun", -11861);
+		bopoMap.put("ya", -11847);
+		bopoMap.put("yan", -11831);
+		bopoMap.put("yang", -11798);
+		bopoMap.put("yao", -11781);
+		bopoMap.put("ye", -11604);
+		bopoMap.put("yi", -11589);
+		bopoMap.put("yin", -11536);
+		bopoMap.put("ying", -11358);
+		bopoMap.put("yo", -11340);
+		bopoMap.put("yong", -11339);
+		bopoMap.put("you", -11324);
+		bopoMap.put("yu", -11303);
+		bopoMap.put("yuan", -11097);
+		bopoMap.put("yue", -11077);
+		bopoMap.put("yun", -11067);
+		bopoMap.put("za", -11055);
+		bopoMap.put("zai", -11052);
+		bopoMap.put("zan", -11045);
+		bopoMap.put("zang", -11041);
+		bopoMap.put("zao", -11038);
+		bopoMap.put("ze", -11024);
+		bopoMap.put("zei", -11020);
+		bopoMap.put("zen", -11019);
+		bopoMap.put("zeng", -11018);
+		bopoMap.put("zha", -11014);
+		bopoMap.put("zhai", -10838);
+		bopoMap.put("zhan", -10832);
+		bopoMap.put("zhang", -10815);
+		bopoMap.put("zhao", -10800);
+		bopoMap.put("zhe", -10790);
+		bopoMap.put("zhen", -10780);
+		bopoMap.put("zheng", -10764);
+		bopoMap.put("zhi", -10587);
+		bopoMap.put("zhong", -10544);
+		bopoMap.put("zhou", -10533);
+		bopoMap.put("zhu", -10519);
+		bopoMap.put("zhua", -10331);
+		bopoMap.put("zhuai", -10329);
+		bopoMap.put("zhuan", -10328);
+		bopoMap.put("zhuang", -10322);
+		bopoMap.put("zhui", -10315);
+		bopoMap.put("zhun", -10309);
+		bopoMap.put("zhuo", -10307);
+		bopoMap.put("zi", -10296);
+		bopoMap.put("zong", -10281);
+		bopoMap.put("zou", -10274);
+		bopoMap.put("zu", -10270);
+		bopoMap.put("zuan", -10262);
+		bopoMap.put("zui", -10260);
+		bopoMap.put("zun", -10256);
+		bopoMap.put("zuo", -10254);
+		bopoMap.put("", -10246);
+	}
+	
+	
 	/**
-	 * µÃµ½Ò»¸öÊ®Áù½øÖÆ×Ö·ûµÄ¶ş½øÖÆ×Ö·û´®±íÊ¾ĞÎÊ½
+	 * å¾—åˆ°ä¸€ä¸ªåå…­è¿›åˆ¶å­—ç¬¦çš„äºŒè¿›åˆ¶å­—ç¬¦ä¸²è¡¨ç¤ºå½¢å¼
 	 * 
 	 * @param hex
-	 *            Ê®Áù½øÖÆ×Ö·û
-	 * @return ¶ş½øÖÆ×Ö·û´®
+	 *            åå…­è¿›åˆ¶å­—ç¬¦
+	 * @return äºŒè¿›åˆ¶å­—ç¬¦ä¸²
 	 */
 	public static String hex2bin(String hex) {
 		if (hex != null) {
-
-			HashMap<String, String> map = new HashMap<String, String>(16);
-			map.put("0", "0000");
-			map.put("1", "0001");
-			map.put("2", "0010");
-			map.put("3", "0011");
-			map.put("4", "0100");
-			map.put("5", "0101");
-			map.put("6", "0110");
-			map.put("7", "0111");
-			map.put("8", "1000");
-			map.put("9", "1001");
-			map.put("A", "1010");
-			map.put("B", "1011");
-			map.put("C", "1100");
-			map.put("D", "1101");
-			map.put("E", "1110");
-			map.put("F", "1111");
-
-			return (String) map.get(hex.toUpperCase());
+			return (String) map_hex2bin.get(hex.toUpperCase());
 		} else
 			return null;
 	}
@@ -85,21 +514,27 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö·û´®×ª»¯³ÉÖ¸¶¨³¤¶ÈµÄÊı×é
+	 * æŠŠå­—ç¬¦ä¸²è½¬åŒ–æˆæŒ‡å®šé•¿åº¦çš„æ•°ç»„
 	 * 
 	 * @param str
-	 *            Òª×ª»»µÄ×Ö·û´®
+	 *            è¦è½¬æ¢çš„å­—ç¬¦ä¸²
 	 * @param len
-	 *            Ö¸¶¨µÄ×ª»»ºóµÄ×Ö½ÚÀàĞÍµÄÊı¾İµÄ×Ü³¤¶È
+	 *            æŒ‡å®šçš„è½¬æ¢åçš„å­—èŠ‚ç±»å‹çš„æ•°æ®çš„æ€»é•¿åº¦
 	 * @param end
-	 *            ×Ö½ÚÊı¾İµÄ×îºóÒ»¸ö×Ö½ÚËùÌîµÄÊı¾İµÄÖµ
-	 * @return ×Ö½ÚÊı×é
+	 *            å­—èŠ‚æ•°æ®çš„æœ€åä¸€ä¸ªå­—èŠ‚æ‰€å¡«çš„æ•°æ®çš„å€¼
+	 * @return å­—èŠ‚æ•°ç»„
 	 */
 	public static byte[] getBytes(String str, int start, int len) {
 		byte[] b = null;
 
 		if (str != null) {
-			byte[] b1 = str.getBytes();
+			byte[] b1;
+			try {
+				b1 = str.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				b1 = str.getBytes();
+			}
 			b = GFCommon.bytesCopy(b1, start, len);
 
 		}
@@ -108,12 +543,12 @@ public class GFString {
 	}
 
 	/**
-	 * ·µ»Ø°´Ö¸¶¨±àÂë·½Ê½±àÂëµÄ×Ö·û´®
+	 * è¿”å›æŒ‰æŒ‡å®šç¼–ç æ–¹å¼ç¼–ç çš„å­—ç¬¦ä¸²
 	 * 
 	 * @param bArray
-	 *            ×Ö½ÚÊı×é
+	 *            å­—èŠ‚æ•°ç»„
 	 * @param charsetName
-	 *            ×Ö·û¼¯
+	 *            å­—ç¬¦é›†
 	 * @return
 	 */
 	public static String getEncodedString(byte[] bArray, String charsetName) {
@@ -132,11 +567,11 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ±íÊ¾Ò»¸öÊıµÄÊ®Áù½øÖÆµÄ×Ö·û´®×ª»¯³ÉÊ®½øÖÆµÄÊı
+	 * æŠŠè¡¨ç¤ºä¸€ä¸ªæ•°çš„åå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²è½¬åŒ–æˆåè¿›åˆ¶çš„æ•°
 	 * 
 	 * @param hex
-	 *            Ê®Áù½øÖÆ×Ö·û´®
-	 * @return Ê®½øÖÆµÄÕûÊı
+	 *            åå…­è¿›åˆ¶å­—ç¬¦ä¸²
+	 * @return åè¿›åˆ¶çš„æ•´æ•°
 	 */
 	public static long hexstr2long(String hex) {
 		long value = 0;
@@ -157,15 +592,15 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö·û´®×ª»¯³É¹Ì¶¨³¤µÄ×Ö·û´®¡£Èç¹û²»¹»Ö¸¶¨µÄ³¤¶È£¬ÔÚÇ°ÃæÌí¼ÓÖ¸¶¨µÄ×Ö·û£» Èç¹û´óÓÚÖ¸¶¨µÄ³¤¶È£¬°ÑºóÃæ¶à³öµÄÈ¥µô¡£
+	 * æŠŠå­—ç¬¦ä¸²è½¬åŒ–æˆå›ºå®šé•¿çš„å­—ç¬¦ä¸²ã€‚å¦‚æœä¸å¤ŸæŒ‡å®šçš„é•¿åº¦ï¼Œåœ¨å‰é¢æ·»åŠ æŒ‡å®šçš„å­—ç¬¦ï¼› å¦‚æœå¤§äºæŒ‡å®šçš„é•¿åº¦ï¼ŒæŠŠåé¢å¤šå‡ºçš„å»æ‰ã€‚
 	 * 
 	 * @param str
-	 *            Òª×ª»»µÄ×Ö·û´®
+	 *            è¦è½¬æ¢çš„å­—ç¬¦ä¸²
 	 * @param len
-	 *            ×ª»»ºóµÄ³¤¶È
+	 *            è½¬æ¢åçš„é•¿åº¦
 	 * @param appendChar
-	 *            Ìí¼ÓµÄ×Ö·û
-	 * @return ×ª»»ºóµÄ×Ö·û´®
+	 *            æ·»åŠ çš„å­—ç¬¦
+	 * @return è½¬æ¢åçš„å­—ç¬¦ä¸²
 	 */
 	public static String getFixedLenStr(String str, int len, char appendChar) {
 		if (str == null || len < 0)
@@ -186,11 +621,11 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÒ»¸ö¶ş½øÖÆ×Ö·û´®µÄ×ª»¯³ÉÒ»¸öÕûÊı
+	 * æŠŠä¸€ä¸ªäºŒè¿›åˆ¶å­—ç¬¦ä¸²çš„è½¬åŒ–æˆä¸€ä¸ªæ•´æ•°
 	 * 
 	 * @param bs
-	 *            ¶ş½øÖÆ×Ö·û´®
-	 * @return ¶ş½øÖÆ×Ö·û´®±íÊ¾µÄÖµ
+	 *            äºŒè¿›åˆ¶å­—ç¬¦ä¸²
+	 * @return äºŒè¿›åˆ¶å­—ç¬¦ä¸²è¡¨ç¤ºçš„å€¼
 	 */
 	public static long bin2long(String bs) {
 		long value = 0;
@@ -206,30 +641,13 @@ public class GFString {
 
 	public static String bin2hex(String bin) {
 		String hex = null;
-		HashMap<String, String> map = new HashMap<String, String>(16);
-		map.put("0000", "0");
-		map.put("0001", "1");
-		map.put("0010", "2");
-		map.put("0011", "3");
-		map.put("0100", "4");
-		map.put("0101", "5");
-		map.put("0110", "6");
-		map.put("0111", "7");
-		map.put("1000", "8");
-		map.put("1001", "9");
-		map.put("1010", "A");
-		map.put("1011", "B");
-		map.put("1100", "C");
-		map.put("1101", "D");
-		map.put("1110", "E");
-		map.put("1111", "F");
 
 		if (bin != null && bin.length() <= 4) {
 			if (isBinstr(bin)) {
 				for (int i = 0; i < 4 - bin.length(); i++)
 					bin = "0" + bin;
 
-				hex = (String) map.get(bin);
+				hex = (String) map_bin2hex.get(bin);
 			}
 		}
 		return hex;
@@ -302,7 +720,13 @@ public class GFString {
 		boolean result = false;
 
 		if (bin != null) {
-			byte[] b = bin.getBytes();
+			byte[] b;
+			try {
+				b = bin.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				b = bin.getBytes();
+				e.printStackTrace();
+			}
 			for (int i = 0; i < b.length; i++) {
 				if (b[i] != 48 && b[i] != 49)
 					return false;
@@ -314,7 +738,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÅĞ¶ÏÒ»¸ö×Ö·û´®ÊÇ·ñÊÇÊı×Ö
+	 * åˆ¤æ–­ä¸€ä¸ªå­—ç¬¦ä¸²æ˜¯å¦æ˜¯æ•°å­—
 	 * 
 	 * @param str
 	 * @return
@@ -335,7 +759,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÅĞ¶Ï×Ö·û´®ÊÇ·ñÈ«ÊÇºº×Ö
+	 * åˆ¤æ–­å­—ç¬¦ä¸²æ˜¯å¦å…¨æ˜¯æ±‰å­—
 	 * 
 	 * @param str
 	 * @return
@@ -344,8 +768,15 @@ public class GFString {
 		if (str != null) {
 			str = quan2ban(str);
 			if (str != null) {
-				if (str.length() * 2 == str.getBytes().length)
-					return true;
+				try {
+					if (str.length() * 2 == str.getBytes("GBK").length)
+						return true;
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					if (str.length() * 2 == str.getBytes().length)
+						return true;
+					
+				}
 			}
 		}
 
@@ -353,7 +784,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÅĞ¶Ï×Ö·û´®ÊÇ·ñÈ«²»ÊÇºº×Ö
+	 * åˆ¤æ–­å­—ç¬¦ä¸²æ˜¯å¦å…¨ä¸æ˜¯æ±‰å­—
 	 * 
 	 * @param str
 	 * @return
@@ -362,8 +793,14 @@ public class GFString {
 		if (str != null) {
 			str = quan2ban(str);
 			if (str != null) {
-				if (str.length() == str.getBytes().length)
-					return true;
+				try {
+					if (str.length() == str.getBytes("GBK").length)
+						return true;
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					if (str.length() == str.getBytes().length)
+						return true;
+				}
 			}
 		}
 
@@ -371,7 +808,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÊÇ·ñÊÇ×ÖÄ¸
+	 * æ˜¯å¦æ˜¯å­—æ¯
 	 * 
 	 * @param str
 	 * @return
@@ -381,7 +818,12 @@ public class GFString {
 			byte b[];
 
 			str = str.trim();
-			b = str.toUpperCase().getBytes();
+			try {
+				b = str.toUpperCase().getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				b = str.toUpperCase().getBytes();
+			}
 			for (int i = 0; i < b.length; i++) {
 				if (b[i] < 65 || b[i] > 90)
 					return false;
@@ -393,11 +835,11 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÒ»¸öÕûÊı×ª»¯³É8Î»¶ş½øÖÆ×Ö·û´®µÄ±íÊ¾ĞÎÊ½
+	 * æŠŠä¸€ä¸ªæ•´æ•°è½¬åŒ–æˆ8ä½äºŒè¿›åˆ¶å­—ç¬¦ä¸²çš„è¡¨ç¤ºå½¢å¼
 	 * 
 	 * @param value
-	 *            0--256Ö®¼äµÄÕûÊı
-	 * @return ³¤¶ÈÎª8µÄ¶ş½øÖÆ×Ö·û´®
+	 *            0--256ä¹‹é—´çš„æ•´æ•°
+	 * @return é•¿åº¦ä¸º8çš„äºŒè¿›åˆ¶å­—ç¬¦ä¸²
 	 */
 	public static String int2bin(int value) {
 		if (value >= 0 && value < 256) {
@@ -413,11 +855,11 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ±íÊ¾Êı×Öº¬ÒåµÄ×Ö·û´®×ªÄã³ÉÕûĞÎ
+	 * æŠŠè¡¨ç¤ºæ•°å­—å«ä¹‰çš„å­—ç¬¦ä¸²è½¬ä½ æˆæ•´å½¢
 	 * 
 	 * @param str
-	 *            Òª×ª»»µÄ×Ö·û´®
-	 * @return Èç¹ûÊÇÓĞÒâÒåµÄÕûÊı£¬Ôò·µ»Ø´ËÕûÊıÖµ¡£·ñÔò£¬·µ»Ø-1¡£
+	 *            è¦è½¬æ¢çš„å­—ç¬¦ä¸²
+	 * @return å¦‚æœæ˜¯æœ‰æ„ä¹‰çš„æ•´æ•°ï¼Œåˆ™è¿”å›æ­¤æ•´æ•°å€¼ã€‚å¦åˆ™ï¼Œè¿”å›-1ã€‚
 	 */
 	public static int cint(String str) {
 		if (str != null)
@@ -444,15 +886,15 @@ public class GFString {
 	}
 
 	/**
-	 * ÔÚÒ»¸ö×Ö·û´®ÖĞÈ¡³öÖ¸¶¨µÄ×Ó×Ö·û´®/
+	 * åœ¨ä¸€ä¸ªå­—ç¬¦ä¸²ä¸­å–å‡ºæŒ‡å®šçš„å­å­—ç¬¦ä¸²/
 	 * 
 	 * @param str
-	 *            ×Ö·û´®
+	 *            å­—ç¬¦ä¸²
 	 * @param begin
-	 *            ¿ªÊ¼Î»ÖÃ£¬´Ó0ÊıÆğ
+	 *            å¼€å§‹ä½ç½®ï¼Œä»0æ•°èµ·
 	 * @param len
-	 *            ×Ó×Ö·û´®µÄ³¤¶È
-	 * @return ×Ó×Ö·û´®
+	 *            å­å­—ç¬¦ä¸²çš„é•¿åº¦
+	 * @return å­å­—ç¬¦ä¸²
 	 */
 	public static String substr(String str, int begin, int len) {
 
@@ -481,7 +923,7 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö½ÚÊı×é×ª»¯³ÉÊ®Áù½øÖÆµÄ×Ö·û´®
+	 * æŠŠå­—èŠ‚æ•°ç»„è½¬åŒ–æˆåå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²
 	 * 
 	 * @param bs
 	 */
@@ -501,7 +943,7 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑUNICODE±àÂëµÄ×Ö·û´®×ª»¯³Éºº×Ö±àÂëµÄ×Ö·û´®
+	 * æŠŠUNICODEç¼–ç çš„å­—ç¬¦ä¸²è½¬åŒ–æˆæ±‰å­—ç¼–ç çš„å­—ç¬¦ä¸²
 	 * 
 	 * @param hexString
 	 * @return
@@ -525,7 +967,7 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñºº×Ö×ª»¯³ÉUNICODE±àÂëµÄ×Ö·û´®
+	 * æŠŠæ±‰å­—è½¬åŒ–æˆUNICODEç¼–ç çš„å­—ç¬¦ä¸²
 	 * 
 	 * @param gbString
 	 * @return
@@ -537,8 +979,6 @@ public class GFString {
 
 		if (gbString == null)
 			return null;
-		// if (gbString.getBytes().length == gbString.length())
-		// return gbString;
 
 		String temp = null;
 		c = new char[gbString.length()];
@@ -546,8 +986,6 @@ public class GFString {
 		sb.getChars(0, sb.length(), c, 0);
 		for (int i = 0; i < c.length; i++) {
 			value = (int) c[i];
-			// System.out.println("[" + i + "]:" +value );
-			// System.out.println("hex:"+Integer.toHexString(value));
 			temp = Integer.toHexString(value);
 			result += fill(temp, 4);
 		}
@@ -556,13 +994,13 @@ public class GFString {
 	}
 
 	/**
-	 * Èç¹û×Ö·û´®µÄ³¤¶ÈÃ»ÓĞ´ïµ½Ö¸¶¨µÄ³¤¶È£¬ÔòÔÚ×Ö·û´®Ç°¼Ó¡°0¡±²¹¹»Ö¸¶¨µÄ³¤¶È
+	 * å¦‚æœå­—ç¬¦ä¸²çš„é•¿åº¦æ²¡æœ‰è¾¾åˆ°æŒ‡å®šçš„é•¿åº¦ï¼Œåˆ™åœ¨å­—ç¬¦ä¸²å‰åŠ â€œ0â€è¡¥å¤ŸæŒ‡å®šçš„é•¿åº¦
 	 * 
 	 * @param src
-	 *            Ô­ÏÈµÄ×Ö·û´®
+	 *            åŸå…ˆçš„å­—ç¬¦ä¸²
 	 * @param len
-	 *            Ö¸¶¨µÄ³¤¶È
-	 * @return Ö¸¶¨³¤¶ÈµÄ×Ö·û´®
+	 *            æŒ‡å®šçš„é•¿åº¦
+	 * @return æŒ‡å®šé•¿åº¦çš„å­—ç¬¦ä¸²
 	 */
 	public static String fill(String src, int len) {
 		String result = null;
@@ -577,15 +1015,15 @@ public class GFString {
 	}
 
 	/**
-	 * ÔÚÖ¸¶¨×Ö·û´®²åÈëµ½Ô´×Ö·û´®µÄÖ¸¶¨Î»ÖÃ
+	 * åœ¨æŒ‡å®šå­—ç¬¦ä¸²æ’å…¥åˆ°æºå­—ç¬¦ä¸²çš„æŒ‡å®šä½ç½®
 	 * 
 	 * @param src
-	 *            Ô´×Ö·û´®
+	 *            æºå­—ç¬¦ä¸²
 	 * @param insertStr
-	 *            Òª²åÈëµÄ×Ö·û´®
+	 *            è¦æ’å…¥çš„å­—ç¬¦ä¸²
 	 * @param index
-	 *            Òª²åÈëµÄÎ»ÖÃ
-	 * @return ²åÈëÖ¸¶¨µÄ×Ö·ûÖ®ºóµÄ×Ö·û´®
+	 *            è¦æ’å…¥çš„ä½ç½®
+	 * @return æ’å…¥æŒ‡å®šçš„å­—ç¬¦ä¹‹åçš„å­—ç¬¦ä¸²
 	 */
 	public static String insert(String src, String insertStr, int index) {
 		String result = src;
@@ -613,7 +1051,7 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÏàÁÙµÄÁ½¸ö×Ö·û¶Ô»»£¬×Ö·û´®³¤¶ÈÎªÆæÊıÊ±×îºó¼Ó¡°F¡±
+	 * æŠŠç›¸ä¸´çš„ä¸¤ä¸ªå­—ç¬¦å¯¹æ¢ï¼Œå­—ç¬¦ä¸²é•¿åº¦ä¸ºå¥‡æ•°æ—¶æœ€ååŠ â€œFâ€
 	 * 
 	 * @param src
 	 * @return
@@ -636,12 +1074,12 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÊı×é°´Ö¸¶¨µÄ±àÂë·½Ê½×ª»¯³É×Ö·û´®
+	 * æŠŠæ•°ç»„æŒ‰æŒ‡å®šçš„ç¼–ç æ–¹å¼è½¬åŒ–æˆå­—ç¬¦ä¸²
 	 * 
 	 * @param b
-	 *            Ô´Êı×é
+	 *            æºæ•°ç»„
 	 * @param encoding
-	 *            ±àÂë·½Ê½
+	 *            ç¼–ç æ–¹å¼
 	 * @return
 	 */
 	public static String bytes2str(byte[] b, String encoding) {
@@ -667,10 +1105,10 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÒ»¸ö×Ö·û´®°´Ö¸¶¨µÄ³¤¶È·Ö¸î
+	 * æŠŠä¸€ä¸ªå­—ç¬¦ä¸²æŒ‰æŒ‡å®šçš„é•¿åº¦åˆ†å‰²
 	 * 
 	 * @param intervalLen
-	 *            ¼ä¸ô³¤¶È
+	 *            é—´éš”é•¿åº¦
 	 * @return
 	 */
 	public static String[] split(String src, int intervalLen) {
@@ -694,7 +1132,7 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö½ÚÊı×é×ª»¯³ÉÊ®Áù½øÖÆµÄ×Ö·û´®
+	 * æŠŠå­—èŠ‚æ•°ç»„è½¬åŒ–æˆåå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²
 	 * 
 	 * @param b
 	 * @return
@@ -704,13 +1142,13 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö½ÚÊı×é×ª»¯³ÉÊ®Áù½øÖÆµÄ×Ö·û´®
+	 * æŠŠå­—èŠ‚æ•°ç»„è½¬åŒ–æˆåå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²
 	 * <p>
 	 * 
 	 * @param b
 	 * @param highBitFirst
-	 *            true:¸ßÎ»ÓÅÏÈ£¬¼´Êä³öµÄÊ®Áù½øÖÆ×Ö·û´®ÊÇ´ÓByteÊı×éµÄ×î´óÏÂ±ê¿ªÊ¼µÄ
-	 *            false:µÍÃÇÓÅÏÈ£¬¼´Êä³öµÄÊ®Áù½øÖÆ×Ö·û´®ÊÇ´ÓByteÊı×éµÄ×îĞ¡ÏÂ±ê0¿ªÊ¼µÄ
+	 *            true:é«˜ä½ä¼˜å…ˆï¼Œå³è¾“å‡ºçš„åå…­è¿›åˆ¶å­—ç¬¦ä¸²æ˜¯ä»Byteæ•°ç»„çš„æœ€å¤§ä¸‹æ ‡å¼€å§‹çš„
+	 *            false:ä½ä»¬ä¼˜å…ˆï¼Œå³è¾“å‡ºçš„åå…­è¿›åˆ¶å­—ç¬¦ä¸²æ˜¯ä»Byteæ•°ç»„çš„æœ€å°ä¸‹æ ‡0å¼€å§‹çš„
 	 * @return
 	 */
 	public static String bytes2hexstr(byte[] b, boolean highBitFirst) {
@@ -741,7 +1179,7 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö½ÚÊı×é×ª»¯³ÉÊ®Áù½øÖÆµÄ×Ö·û´®
+	 * æŠŠå­—èŠ‚æ•°ç»„è½¬åŒ–æˆåå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²
 	 * 
 	 * @param b
 	 * @return
@@ -764,7 +1202,7 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÊ®Áù½øÖÆ×Ö·û´®×ª»¯³É×Ö½ÚÊı×é Èç¹û³¤¶È²»ÊÇÅ¼ÊıµÄ»°£¬Ç°Ãæ¼Ó¡°0¡±
+	 * æŠŠåå…­è¿›åˆ¶å­—ç¬¦ä¸²è½¬åŒ–æˆå­—èŠ‚æ•°ç»„ å¦‚æœé•¿åº¦ä¸æ˜¯å¶æ•°çš„è¯ï¼Œå‰é¢åŠ â€œ0â€
 	 * 
 	 * @param hexstr
 	 * @return
@@ -838,7 +1276,7 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÕûÊı×ª»»³ÉÖ¸¶¨³¤¶ÈµÄ×Ö·û´® Èç¹ûÖ¸¶¨³¤¶ÈĞ¡ÓÚÕûÊıµÄ×Ö·û´®³¤¶È£¬ÔòÖ»È¡Ç°ÃæLEN¸ö×Ö·û¡£ Èç¹ûLENĞ¡0£¬Ôò·µ»ØÕûÊıµÄ×Ö·û´®±íÊ¾ĞÍÊ½
+	 * æŠŠæ•´æ•°è½¬æ¢æˆæŒ‡å®šé•¿åº¦çš„å­—ç¬¦ä¸² å¦‚æœæŒ‡å®šé•¿åº¦å°äºæ•´æ•°çš„å­—ç¬¦ä¸²é•¿åº¦ï¼Œåˆ™åªå–å‰é¢LENä¸ªå­—ç¬¦ã€‚ å¦‚æœLENå°0ï¼Œåˆ™è¿”å›æ•´æ•°çš„å­—ç¬¦ä¸²è¡¨ç¤ºå‹å¼
 	 * 
 	 * @param value
 	 * @param len
@@ -861,7 +1299,7 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÊ®Áù½øÖÆÊı×ª»¯³É×Ö½Ú
+	 * æŠŠåå…­è¿›åˆ¶æ•°è½¬åŒ–æˆå­—èŠ‚
 	 * 
 	 * @param hex
 	 * @return
@@ -896,7 +1334,7 @@ public class GFString {
 	}
 
 	/**
-	 * °Ñ×Ö½Ú×ª»»³ÉÊ®Áù½øÖÆ×Ö·û´®£¬¹Ì¶¨ÎªÁ½¸ö×Ö·û³¤¶È
+	 * æŠŠå­—èŠ‚è½¬æ¢æˆåå…­è¿›åˆ¶å­—ç¬¦ä¸²ï¼Œå›ºå®šä¸ºä¸¤ä¸ªå­—ç¬¦é•¿åº¦
 	 * 
 	 * @param b
 	 * @return
@@ -910,11 +1348,11 @@ public class GFString {
 	}
 
 	/**
-	 * ÓÃUTF-16BEµÄ±àÂë·½Ê½°Ñº¬ÓĞÈ«½Ç±àÂëµÄ×Ö·û´®×ª³É°ë½Ç±àÂëµÄ×Ö·û´®
+	 * ç”¨UTF-16BEçš„ç¼–ç æ–¹å¼æŠŠå«æœ‰å…¨è§’ç¼–ç çš„å­—ç¬¦ä¸²è½¬æˆåŠè§’ç¼–ç çš„å­—ç¬¦ä¸²
 	 * <p>
-	 * ±ÈÈç°Ñ¡°ºº#££012£°£±£²Y£Ù¡±×ª³É¡°ºº##012012YY¡±
+	 * æ¯”å¦‚æŠŠâ€œæ±‰#ï¼ƒ012ï¼ï¼‘ï¼’Yï¼¹â€è½¬æˆâ€œæ±‰##012012YYâ€
 	 * <p>
-	 * ¶ÔÈ«½ÇµÄ¿Õ¸ñ´¦Àí»¹ÓĞÎÊÌâ
+	 * å¯¹å…¨è§’çš„ç©ºæ ¼å¤„ç†è¿˜æœ‰é—®é¢˜
 	 * 
 	 * @param str
 	 * @return
@@ -946,7 +1384,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÓÃUTF-16BEµÄ±àÂë·½Ê½°Ñº¬ÓĞ°ë½ÇµÄ×Ö·û´®×ª³ÉÈ«½Ç×Ö·û´®
+	 * ç”¨UTF-16BEçš„ç¼–ç æ–¹å¼æŠŠå«æœ‰åŠè§’çš„å­—ç¬¦ä¸²è½¬æˆå…¨è§’å­—ç¬¦ä¸²
 	 * 
 	 * @param str
 	 * @return
@@ -977,7 +1415,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÓÃGBK±àÂë½øĞĞÈ«½Ç×ª°ë½Ç
+	 * ç”¨GBKç¼–ç è¿›è¡Œå…¨è§’è½¬åŠè§’
 	 * 
 	 * @param str
 	 * @return
@@ -1013,11 +1451,11 @@ public class GFString {
 	// CDA3 D6B9 20 BABA 23 A3A3 303132 A3B0A3B1A3B259A3D939D3AC39A3D9
 
 	/**
-	 * ÓÃGBK±àÂë½øĞĞ°ë½Ç×ªÈ«½Ç
+	 * ç”¨GBKç¼–ç è¿›è¡ŒåŠè§’è½¬å…¨è§’
 	 * <p>
-	 * ´ÓÃ¿¸ö×Ö½ÚÅĞÆğ£¬Èç¹ûÒ»¸ö×Ö½ÚµÄÖµ²»´óÓÚ0X7F£¬ÔòËüÊÇAsciiÂëµÄ×Ö·û¡£½øÈëÏÂÒ»¸öÅĞ¶Ï¡£
+	 * ä»æ¯ä¸ªå­—èŠ‚åˆ¤èµ·ï¼Œå¦‚æœä¸€ä¸ªå­—èŠ‚çš„å€¼ä¸å¤§äº0X7Fï¼Œåˆ™å®ƒæ˜¯Asciiç çš„å­—ç¬¦ã€‚è¿›å…¥ä¸‹ä¸€ä¸ªåˆ¤æ–­ã€‚
 	 * <p>
-	 * Èç¹ûÒ»¸ö×Ö½ÚµÄÖµ´óÓÚ0X81£¬ÇÒ½ô¸ú×ÅËüµÄÏÂÒ»¸ö×Ö½ÚµÄÖµÔÚ0x40--0xFEÖ®¼ä£¬ÔòÊÇºº×Ö»òÈ«½Ç×Ö·û
+	 * å¦‚æœä¸€ä¸ªå­—èŠ‚çš„å€¼å¤§äº0X81ï¼Œä¸”ç´§è·Ÿç€å®ƒçš„ä¸‹ä¸€ä¸ªå­—èŠ‚çš„å€¼åœ¨0x40--0xFEä¹‹é—´ï¼Œåˆ™æ˜¯æ±‰å­—æˆ–å…¨è§’å­—ç¬¦
 	 * 
 	 * @param str
 	 * @return
@@ -1054,7 +1492,7 @@ public class GFString {
 	}
 
 	/**
-	 * È¥µô×Ö·û´®ÖĞµÄ¿Õ°×·û
+	 * å»æ‰å­—ç¬¦ä¸²ä¸­çš„ç©ºç™½ç¬¦
 	 * 
 	 * @param s
 	 * @return
@@ -1078,11 +1516,11 @@ public class GFString {
 	}
 
 	/**
-	 * ¶Ô×Ö·û´®ÖĞµÄ¿Õ¸ñ½øĞĞ¸ñÊ½»¯,È¥µô¿ªÍ·ºÍ×îºóµÄ¿Õ¸ñ,°Ñ×Ö·ûÖ®¼äµÄ¿Õ¸ñËõ¼õÎª1¸ö.
+	 * å¯¹å­—ç¬¦ä¸²ä¸­çš„ç©ºæ ¼è¿›è¡Œæ ¼å¼åŒ–,å»æ‰å¼€å¤´å’Œæœ€åçš„ç©ºæ ¼,æŠŠå­—ç¬¦ä¹‹é—´çš„ç©ºæ ¼ç¼©å‡ä¸º1ä¸ª.
 	 * <p>
-	 * ±ÈÈç:<¿Õ¸ñ><¿Õ¸ñ>ÎÒÊÇÒ»¸öÈË<¿Õ¸ñ><¿Õ¸ñ><¿Õ¸ñ>ÖĞ¹úÈË<¿Õ¸ñ>´óÑ§Éú<¿Õ¸ñ><¿Õ¸ñ>
+	 * æ¯”å¦‚:<ç©ºæ ¼><ç©ºæ ¼>æˆ‘æ˜¯ä¸€ä¸ªäºº<ç©ºæ ¼><ç©ºæ ¼><ç©ºæ ¼>ä¸­å›½äºº<ç©ºæ ¼>å¤§å­¦ç”Ÿ<ç©ºæ ¼><ç©ºæ ¼>
 	 * <p>
-	 * ½á¹ûÓ¦¸ÃÎª:ÎÒÊÇÒ»¸öÈË<¿Õ¸ñ>ÖĞ¹úÈË<¿Õ¸ñ>´óÑ§Éú
+	 * ç»“æœåº”è¯¥ä¸º:æˆ‘æ˜¯ä¸€ä¸ªäºº<ç©ºæ ¼>ä¸­å›½äºº<ç©ºæ ¼>å¤§å­¦ç”Ÿ
 	 * 
 	 * @param src
 	 * @return
@@ -1107,7 +1545,7 @@ public class GFString {
 	}
 
 	/**
-	 * 7-BIT±àÂë °ÑASCIIÂëÖµ×î¸ßÎ»Îª0µÄ×Ö·û´®½øĞĞÑ¹Ëõ×ª»»³É8Î»¶ş½øÖÆ±íÊ¾µÄ×Ö·û´®
+	 * 7-BITç¼–ç  æŠŠASCIIç å€¼æœ€é«˜ä½ä¸º0çš„å­—ç¬¦ä¸²è¿›è¡Œå‹ç¼©è½¬æ¢æˆ8ä½äºŒè¿›åˆ¶è¡¨ç¤ºçš„å­—ç¬¦ä¸²
 	 * 
 	 * @param src
 	 * @return
@@ -1116,11 +1554,23 @@ public class GFString {
 		String result = null;
 		String hex = null;
 		byte value;
-
-		if (src != null && src.length() == src.getBytes().length) {
+    int length = 0;
+    try {
+      length = src.getBytes("GBK").length;
+    } catch (Exception e) {
+      length = src.getBytes().length;
+      e.printStackTrace();
+    }
+		if (src != null && src.length() == length ) {
 			result = "";
 			byte left = 0;
-			byte[] b = src.getBytes();
+			byte[] b;
+			try {
+				b = src.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				b = src.getBytes();
+			}
 			for (int i = 0, j = 0; i < b.length; i++) {
 				j = i & 7;
 				if (j == 0)
@@ -1141,11 +1591,11 @@ public class GFString {
 	}
 
 	/**
-	 * ¶Ô7-BIT±àÂë½øĞĞ½âÂë
+	 * å¯¹7-BITç¼–ç è¿›è¡Œè§£ç 
 	 * 
 	 * @param src
-	 *            Ê®Áù½øÖÆµÄ×Ö·û´®£¬ÇÒÎªÅ¼Êı¸ö
-	 * @return Ô´×Ö·û´®
+	 *            åå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²ï¼Œä¸”ä¸ºå¶æ•°ä¸ª
+	 * @return æºå­—ç¬¦ä¸²
 	 */
 	public static String decode7bit(String src) {
 		String result = null;
@@ -1178,10 +1628,10 @@ public class GFString {
 
 	/**
 	 * <pre>
-	 *                                     ÊÇ·ñÊÇÊÖ»úºÅÂë
-	 *                                     1.11Î»
-	 *                                     2.ÊÇÊı×Ö
-	 *                                     3.ÒÔ&quot;13&quot;¿ªÍ·
+	 *                                     æ˜¯å¦æ˜¯æ‰‹æœºå·ç 
+	 *                                     1.11ä½
+	 *                                     2.æ˜¯æ•°å­—
+	 *                                     3.ä»¥&quot;13&quot;å¼€å¤´
 	 * </pre>
 	 * 
 	 * @param msg
@@ -1201,12 +1651,12 @@ public class GFString {
 
 	/**
 	 * <pre>
-	 *                                    ÊÇ·ñÊÇÒ»¸öµç»°ºÅÂë.
-	 *                                    Ê×ÏÈ×öÔ¤´¦Àí,°Ñ×ªÈ«½Ç×Ö·û×ª³É°ë½Ç,²¢°Ñ·ÇÊı×Ö×Ö·ûÈ¥µô,ÓÃ¿Õ¸ñÌæ´ú
+	 *                                    æ˜¯å¦æ˜¯ä¸€ä¸ªç”µè¯å·ç .
+	 *                                    é¦–å…ˆåšé¢„å¤„ç†,æŠŠè½¬å…¨è§’å­—ç¬¦è½¬æˆåŠè§’,å¹¶æŠŠéæ•°å­—å­—ç¬¦å»æ‰,ç”¨ç©ºæ ¼æ›¿ä»£
 	 *                                    
-	 *                                    1.³¤¶ÈÒªÖÁµÈÓÚ7,µ«²»ÄÜ³¬¹ı12
-	 *                                    2.ÊÖ»úºÅÊÇÒ»¸öµç»°ºÅÂë
-	 *                                    3.°´¿Õ¸ñ·Ö¸ô,³¤¶È´óÓÚµÈÓÚ3ÇÒĞ¡ÓÚµÈÓÚ12µÄÊı×Ö×Ö¶ÎÖÁÉÙÓĞÒ»¸ö,ÇÒ×î´ó²»³¬¹ı2¸ö
+	 *                                    1.é•¿åº¦è¦è‡³ç­‰äº7,ä½†ä¸èƒ½è¶…è¿‡12
+	 *                                    2.æ‰‹æœºå·æ˜¯ä¸€ä¸ªç”µè¯å·ç 
+	 *                                    3.æŒ‰ç©ºæ ¼åˆ†éš”,é•¿åº¦å¤§äºç­‰äº3ä¸”å°äºç­‰äº12çš„æ•°å­—å­—æ®µè‡³å°‘æœ‰ä¸€ä¸ª,ä¸”æœ€å¤§ä¸è¶…è¿‡2ä¸ª
 	 * </pre>
 	 * 
 	 * @param msg
@@ -1248,9 +1698,9 @@ public class GFString {
 	 
 	/**
 	 * <pre>
-	 *                               µÃµ½Ö¸¶¨Î»ÖÃÇ°µÄ·Ç¿Õ¸ñ×Ö·û
-	 *                               ±ÈÈç£ºÔ´×Ö·û´®Îª:2ÊÒÒ»Ìü£¬¡°ÊÒ¡±Ç°Ò»¸öÓĞĞ§×Ö·ûÎª2
-	 *                               Ô´×Ö·û´®Îª£º2 ÊÒ Ò»Ìü£¬¡°ÊÒ¡±Ç°Ò»¸öÓĞĞ§×Ö·ûÎª2
+	 *                               å¾—åˆ°æŒ‡å®šä½ç½®å‰çš„éç©ºæ ¼å­—ç¬¦
+	 *                               æ¯”å¦‚ï¼šæºå­—ç¬¦ä¸²ä¸º:2å®¤ä¸€å…ï¼Œâ€œå®¤â€å‰ä¸€ä¸ªæœ‰æ•ˆå­—ç¬¦ä¸º2
+	 *                               æºå­—ç¬¦ä¸²ä¸ºï¼š2 å®¤ ä¸€å…ï¼Œâ€œå®¤â€å‰ä¸€ä¸ªæœ‰æ•ˆå­—ç¬¦ä¸º2
 	 * </pre>
 	 * 
 	 * @param msg
@@ -1272,13 +1722,13 @@ public class GFString {
 	}
 
 	/**
-	 * °´×Ö·û´®³¤¶ÈµÄ³¤¶Ì½øĞĞÅÅĞò
+	 * æŒ‰å­—ç¬¦ä¸²é•¿åº¦çš„é•¿çŸ­è¿›è¡Œæ’åº
 	 * <p>
-	 * Ñ¡ÓÃ¿ìËÙÅÅĞòËã·¨
+	 * é€‰ç”¨å¿«é€Ÿæ’åºç®—æ³•
 	 * 
 	 * @param list
 	 * @param long2short
-	 *            True:´Ó³¤µ½¶Ì.False:´Ó¶Ìµ½³¤
+	 *            True:ä»é•¿åˆ°çŸ­.False:ä»çŸ­åˆ°é•¿
 	 * @return
 	 */
 	public static ArrayList<String> sortByLen(ArrayList<String> list, boolean long2short) {
@@ -1318,15 +1768,15 @@ public class GFString {
 	}
 
 	/**
-	 * °ÑÖ¸¶¨Î»ÖÃÖ¸¶¨³¤¶ÈµÄ×Ö·ûÓÃĞÂ×Ö·û´®Ìæ»»µô
+	 * æŠŠæŒ‡å®šä½ç½®æŒ‡å®šé•¿åº¦çš„å­—ç¬¦ç”¨æ–°å­—ç¬¦ä¸²æ›¿æ¢æ‰
 	 * 
-	 * @param Ô´×Ö·û´®
+	 * @param æºå­—ç¬¦ä¸²
 	 * @param index
-	 *            Ìæ»»×Ö·û´®µÄ¿ªÊ¼ÏÂ±ê
+	 *            æ›¿æ¢å­—ç¬¦ä¸²çš„å¼€å§‹ä¸‹æ ‡
 	 * @param len
-	 *            Ìæ»»µÄ³¤¶È
+	 *            æ›¿æ¢çš„é•¿åº¦
 	 * @param newstr
-	 *            ĞÂ×Ö·û´®
+	 *            æ–°å­—ç¬¦ä¸²
 	 * @return
 	 */
 	public static String replace(String src, int index, int len, String newstr) {
@@ -1349,7 +1799,13 @@ public class GFString {
 
 	public static boolean hasZero(String msg) {
 		if (msg != null) {
-			byte[] bb = msg.getBytes();
+			byte[] bb;
+			try {
+				bb = msg.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				bb = msg.getBytes();
+			}
 			for (byte b : bb)
 				if (b == 0)
 					return true;
@@ -1359,14 +1815,20 @@ public class GFString {
 	}
 
 	/**
-	 * ÅĞ¶Ï×Ö·û´®ÊÇ·ñÊÇ×ÖÄ¸Êı×ÖµÄ
+	 * åˆ¤æ–­å­—ç¬¦ä¸²æ˜¯å¦æ˜¯å­—æ¯æ•°å­—çš„
 	 * 
 	 * @param str
 	 * @return
 	 */
 	public static boolean isAlphanumeric(String str) {
 		if (str != null) {
-			byte[] bs = str.getBytes();
+			byte[] bs;
+			try {
+				bs = str.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				bs = str.getBytes();
+			}
 			for (byte b : bs) {
 				if (b < 48 || b > 57 && b < 65 || b > 90 && b < 97 || b > 122)
 					return false;
@@ -1377,14 +1839,14 @@ public class GFString {
 	}
 
 	/**
-	 * È¥µôµØÃû(ÊĞ/Çø/ÏØ/Ïç/´å)µÄºó×º"ÊĞ/Çø/ÏØ/Ïç/Õò/´å"
+	 * å»æ‰åœ°å(å¸‚/åŒº/å¿/ä¹¡/æ‘)çš„åç¼€"å¸‚/åŒº/å¿/ä¹¡/é•‡/æ‘"
 	 * 
 	 * @param placename
 	 * @return
 	 */
 	public static String removePlacenameSuffix(String placename) {
 		int index = -1;
-		String[] suffix = { "Ê¡", "ÊĞ", "Çø", "ÏØ", "Ïç", "Õò", "´å" };
+		String[] suffix = { "çœ", "å¸‚", "åŒº", "å¿", "ä¹¡", "é•‡", "æ‘" };
 		if (placename != null && placename.length() > 1) {
 			for (String s : suffix) {
 				index = placename.indexOf(s);
@@ -1399,11 +1861,11 @@ public class GFString {
 	}
 
 	/**
-	 * Ìí¼ÓµØÃûºó×º(ÊĞ/Çø/ÏØ/Ïç/´å)µÄºó×º"ÊĞ/Çø/ÏØ/Ïç/Õò/´å"
+	 * æ·»åŠ åœ°ååç¼€(å¸‚/åŒº/å¿/ä¹¡/æ‘)çš„åç¼€"å¸‚/åŒº/å¿/ä¹¡/é•‡/æ‘"
 	 * 
 	 * @param placename
 	 * @param type
-	 *            µØÃûÀàĞÍ 0:Ê¡ 1:ÊĞ 2:Çø 3:ÏØ
+	 *            åœ°åç±»å‹ 0:çœ 1:å¸‚ 2:åŒº 3:å¿
 	 * 
 	 * @return
 	 */
@@ -1423,7 +1885,7 @@ public class GFString {
 	}
 
 	/**
-	 * ±È½ÏÁ½¸ö×Ö·û´®,¿´str1ÊÇ·ñÔÚstr2Ç°,°´×ÖÄ¸ÅÅĞò. ±ÈÈç:abcÊÇÔÚadcÖ®Ç°
+	 * æ¯”è¾ƒä¸¤ä¸ªå­—ç¬¦ä¸²,çœ‹str1æ˜¯å¦åœ¨str2å‰,æŒ‰å­—æ¯æ’åº. æ¯”å¦‚:abcæ˜¯åœ¨adcä¹‹å‰
 	 * 
 	 * @param str1
 	 * @param str2
@@ -1433,8 +1895,17 @@ public class GFString {
 		boolean rs = false;
 		if (str1 != null && str2 != null) {
 			int len = str1.length() < str2.length() ? str1.length() : str2.length();
-			byte[] b1 = str1.getBytes();
-			byte[] b2 = str2.getBytes();
+			byte[] b1;
+			byte[] b2;
+			try {
+				b1 = str1.getBytes("GBK");
+				b2 = str2.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				b1 = str1.getBytes();
+				b2 = str2.getBytes();
+			}
+
 
 			for (int i = 0; i < len; i++) {
 				if (b2[i] > b1[i])
@@ -1450,7 +1921,7 @@ public class GFString {
  
 
 	/**
-	 * ÊÇ·ñÊÇÁªÍ¨ÊÖ»úºÅÂë
+	 * æ˜¯å¦æ˜¯è”é€šæ‰‹æœºå·ç 
 	 * 
 	 * @param sim
 	 * @return
@@ -1466,7 +1937,7 @@ public class GFString {
 	}
 
 	/**
-	 * ÊÇ·ñÊÇÁªÍ¨ÊÖ»úºÅÂë
+	 * æ˜¯å¦æ˜¯è”é€šæ‰‹æœºå·ç 
 	 * 
 	 * @param sim
 	 * @return
@@ -1484,7 +1955,7 @@ public class GFString {
 	}
 
 	/**
-	 * È¡µÃÖ¸¶¨Î»ÖÃºóÃæµÄ½ôÁÚµÄ×Ö·û
+	 * å–å¾—æŒ‡å®šä½ç½®åé¢çš„ç´§é‚»çš„å­—ç¬¦
 	 * 
 	 * @param str
 	 * @param index
@@ -1508,21 +1979,20 @@ public class GFString {
 	}
 
 	/**
-	 * ¶Ô×Ö·û´®½øĞĞÔ­×Ó·Ö¸ô,±ÈÈç:½â·Å¾üµÚ101Ò½Ôº----½â ·Å ¾ü µÚ 1 0 1 Ò½ Ôº
+	 * å¯¹å­—ç¬¦ä¸²è¿›è¡ŒåŸå­åˆ†éš”,æ¯”å¦‚:è§£æ”¾å†›ç¬¬101åŒ»é™¢----è§£ æ”¾ å†› ç¬¬ 1 0 1 åŒ» é™¢
 	 * 
 	 * @param str
 	 * @return
 	 */
-	public static String[] atomSplit(String str) {
+	public static String[] atomSplit(String str) {		
+		if (str==null) {return null;}
+		
 		String[] result = null;
-		if (str != null) {
-			result = new String[str.length()];
-			String temp = str + " ";
-			for (int i = 0; i < temp.length() - 1; i++) {
-				result[i] = temp.substring(i, i + 1);
-			}
+		int nLen=str.length();
+		result = new String[nLen];			
+		for (int i = 0; i < nLen; i++) {
+			result[i] = str.substring(i, i + 1);
 		}
-
 		return result;
 	}
 
@@ -1550,12 +2020,12 @@ public class GFString {
 	}
 
 	/**
-	 * ÕÒµ½POS´ÊĞÔ±ê¼ÇµÄÎ»ÖÃ
+	 * æ‰¾åˆ°POSè¯æ€§æ ‡è®°çš„ä½ç½®
 	 * 
 	 * @param str
-	 *            ·Ö´ÊµÄ×Ö·û´®
+	 *            åˆ†è¯çš„å­—ç¬¦ä¸²
 	 * @param pos
-	 *            ×Ö´Ê±ê¼Ç
+	 *            å­—è¯æ ‡è®°
 	 * @return
 	 */
 	public static int findPos(String str, String pos) {
@@ -1575,10 +2045,10 @@ public class GFString {
 	}
 
 	/**
-	 * È¥µô´ÊĞÔ±ê×¢£¬»ñÈ¡¹Ø¼ü´Ê
+	 * å»æ‰è¯æ€§æ ‡æ³¨ï¼Œè·å–å…³é”®è¯
 	 * 
 	 * @param str
-	 *            ´ø´ÊĞÔ±ê×¢µÄ¹Ø¼ü´Ê,±ÈÈç£ºÍÅĞ£/bs /sh
+	 *            å¸¦è¯æ€§æ ‡æ³¨çš„å…³é”®è¯,æ¯”å¦‚ï¼šå›¢æ ¡/bs /sh
 	 * @return
 	 */
 	public static String getPOSKey(String str) {
@@ -1594,12 +2064,12 @@ public class GFString {
 
 	/**
 	 * <pre>
-	 *  ¸ù¾İ´ÊĞÔ±ê×¢½øĞĞ·Ö¸ô£¬Ò»¸ö¹Ø¼ü´Ê¿ÉÄÜÓĞ¶à¸ö´ÊĞÔ±ê×¢£¬ÔÚ·Ö¸ôÊÇÊÓÎªÒ»¸öÕûÌå¡£
-	 *  ±ÈÈç£ºÍÅĞ£/bs /sh µ½ ÑÅÊËÔ·/bs /cm
-	 *  ·Ö¸ôºó:
-	 *  ÍÅĞ£/bs /sh 
-	 *  µ½ 
-	 *  ÑÅÊËÔ·/bs /cm
+	 *  æ ¹æ®è¯æ€§æ ‡æ³¨è¿›è¡Œåˆ†éš”ï¼Œä¸€ä¸ªå…³é”®è¯å¯èƒ½æœ‰å¤šä¸ªè¯æ€§æ ‡æ³¨ï¼Œåœ¨åˆ†éš”æ˜¯è§†ä¸ºä¸€ä¸ªæ•´ä½“ã€‚
+	 *  æ¯”å¦‚ï¼šå›¢æ ¡/bs /sh åˆ° é›…ä»•è‹‘/bs /cm
+	 *  åˆ†éš”å:
+	 *  å›¢æ ¡/bs /sh 
+	 *  åˆ° 
+	 *  é›…ä»•è‹‘/bs /cm
 	 * </pre>
 	 * 
 	 * @param str
@@ -1628,7 +2098,7 @@ public class GFString {
 	}
 
 	/**
-	 * µÃµ½Ò»¸öºº×Ö´®¶ÔÓ¦µÄÆ´Òô.Ö»°Ñ´®µÄºº×Ö½øĞĞ×ª»»,ÆäËü×Ö·û±£³Ö²»±ä
+	 * å¾—åˆ°ä¸€ä¸ªæ±‰å­—ä¸²å¯¹åº”çš„æ‹¼éŸ³.åªæŠŠä¸²çš„æ±‰å­—è¿›è¡Œè½¬æ¢,å…¶å®ƒå­—ç¬¦ä¿æŒä¸å˜
 	 * 
 	 * @param cstr
 	 * @return
@@ -1637,410 +2107,17 @@ public class GFString {
 		String bopomofo = null;
 
 		if (cstr != null) {
-			LinkedHashMap<String, Integer> bopoMap = new LinkedHashMap<String, Integer>();
-			bopoMap.put("a", 1);
-			bopoMap.put("a", -20319);
-			bopoMap.put("ai", -20317);
-			bopoMap.put("an", -20304);
-			bopoMap.put("ang", -20295);
-			bopoMap.put("ao", -20292);
-			bopoMap.put("ba", -20283);
-			bopoMap.put("bai", -20265);
-			bopoMap.put("ban", -20257);
-			bopoMap.put("bang", -20242);
-			bopoMap.put("bao", -20230);
-			bopoMap.put("bei", -20051);
-			bopoMap.put("ben", -20036);
-			bopoMap.put("beng", -20032);
-			bopoMap.put("bi", -20026);
-			bopoMap.put("bian", -20002);
-			bopoMap.put("biao", -19990);
-			bopoMap.put("bie", -19986);
-			bopoMap.put("bin", -19982);
-			bopoMap.put("bing", -19976);
-			bopoMap.put("bo", -19805);
-			bopoMap.put("bu", -19784);
-			bopoMap.put("ca", -19775);
-			bopoMap.put("cai", -19774);
-			bopoMap.put("can", -19763);
-			bopoMap.put("cang", -19756);
-			bopoMap.put("cao", -19751);
-			bopoMap.put("ce", -19746);
-			bopoMap.put("ceng", -19741);
-			bopoMap.put("cha", -19739);
-			bopoMap.put("chai", -19728);
-			bopoMap.put("chan", -19725);
-			bopoMap.put("chang", -19715);
-			bopoMap.put("chao", -19540);
-			bopoMap.put("che", -19531);
-			bopoMap.put("chen", -19525);
-			bopoMap.put("cheng", -19515);
-			bopoMap.put("chi", -19500);
-			bopoMap.put("chong", -19484);
-			bopoMap.put("chou", -19479);
-			bopoMap.put("chu", -19467);
-			bopoMap.put("chuai", -19289);
-			bopoMap.put("chuan", -19288);
-			bopoMap.put("chuang", -19281);
-			bopoMap.put("chui", -19275);
-			bopoMap.put("chun", -19270);
-			bopoMap.put("chuo", -19263);
-			bopoMap.put("ci", -19261);
-			bopoMap.put("cong", -19249);
-			bopoMap.put("cou", -19243);
-			bopoMap.put("cu", -19242);
-			bopoMap.put("cuan", -19238);
-			bopoMap.put("cui", -19235);
-			bopoMap.put("cun", -19227);
-			bopoMap.put("cuo", -19224);
-			bopoMap.put("da", -19218);
-			bopoMap.put("dai", -19212);
-			bopoMap.put("dan", -19038);
-			bopoMap.put("dang", -19023);
-			bopoMap.put("dao", -19018);
-			bopoMap.put("de", -19006);
-			bopoMap.put("deng", -19003);
-			bopoMap.put("di", -18996);
-			bopoMap.put("dian", -18977);
-			bopoMap.put("diao", -18961);
-			bopoMap.put("die", -18952);
-			bopoMap.put("ding", -18783);
-			bopoMap.put("diu", -18774);
-			bopoMap.put("dong", -18773);
-			bopoMap.put("dou", -18763);
-			bopoMap.put("du", -18756);
-			bopoMap.put("duan", -18741);
-			bopoMap.put("dui", -18735);
-			bopoMap.put("dun", -18731);
-			bopoMap.put("duo", -18722);
-			bopoMap.put("e", -18710);
-			bopoMap.put("en", -18697);
-			bopoMap.put("er", -18696);
-			bopoMap.put("fa", -18526);
-			bopoMap.put("fan", -18518);
-			bopoMap.put("fang", -18501);
-			bopoMap.put("fei", -18490);
-			bopoMap.put("fen", -18478);
-			bopoMap.put("feng", -18463);
-			bopoMap.put("fo", -18448);
-			bopoMap.put("fou", -18447);
-			bopoMap.put("fu", -18446);
-			bopoMap.put("ga", -18239);
-			bopoMap.put("gai", -18237);
-			bopoMap.put("gan", -18231);
-			bopoMap.put("gang", -18220);
-			bopoMap.put("gao", -18211);
-			bopoMap.put("ge", -18201);
-			bopoMap.put("gei", -18184);
-			bopoMap.put("gen", -18183);
-			bopoMap.put("geng", -18181);
-			bopoMap.put("gong", -18012);
-			bopoMap.put("gou", -17997);
-			bopoMap.put("gu", -17988);
-			bopoMap.put("gua", -17970);
-			bopoMap.put("guai", -17964);
-			bopoMap.put("guan", -17961);
-			bopoMap.put("guang", -17950);
-			bopoMap.put("gui", -17947);
-			bopoMap.put("gun", -17931);
-			bopoMap.put("guo", -17928);
-			bopoMap.put("ha", -17922);
-			bopoMap.put("hai", -17759);
-			bopoMap.put("han", -17752);
-			bopoMap.put("hang", -17733);
-			bopoMap.put("hao", -17730);
-			bopoMap.put("he", -17721);
-			bopoMap.put("hei", -17703);
-			bopoMap.put("hen", -17701);
-			bopoMap.put("heng", -17697);
-			bopoMap.put("hong", -17692);
-			bopoMap.put("hou", -17683);
-			bopoMap.put("hu", -17676);
-			bopoMap.put("hua", -17496);
-			bopoMap.put("huai", -17487);
-			bopoMap.put("huan", -17482);
-			bopoMap.put("huang", -17468);
-			bopoMap.put("hui", -17454);
-			bopoMap.put("hun", -17433);
-			bopoMap.put("huo", -17427);
-			bopoMap.put("ji", -17417);
-			bopoMap.put("jia", -17202);
-			bopoMap.put("jian", -17185);
-			bopoMap.put("jiang", -16983);
-			bopoMap.put("jiao", -16970);
-			bopoMap.put("jie", -16942);
-			bopoMap.put("jin", -16915);
-			bopoMap.put("jing", -16733);
-			bopoMap.put("jiong", -16708);
-			bopoMap.put("jiu", -16706);
-			bopoMap.put("ju", -16689);
-			bopoMap.put("juan", -16664);
-			bopoMap.put("jue", -16657);
-			bopoMap.put("jun", -16647);
-			bopoMap.put("ka", -16474);
-			bopoMap.put("kai", -16470);
-			bopoMap.put("kan", -16465);
-			bopoMap.put("kang", -16459);
-			bopoMap.put("kao", -16452);
-			bopoMap.put("ke", -16448);
-			bopoMap.put("ken", -16433);
-			bopoMap.put("keng", -16429);
-			bopoMap.put("kong", -16427);
-			bopoMap.put("kou", -16423);
-			bopoMap.put("ku", -16419);
-			bopoMap.put("kua", -16412);
-			bopoMap.put("kuai", -16407);
-			bopoMap.put("kuan", -16403);
-			bopoMap.put("kuang", -16401);
-			bopoMap.put("kui", -16393);
-			bopoMap.put("kun", -16220);
-			bopoMap.put("kuo", -16216);
-			bopoMap.put("la", -16212);
-			bopoMap.put("lai", -16205);
-			bopoMap.put("lan", -16202);
-			bopoMap.put("lang", -16187);
-			bopoMap.put("lao", -16180);
-			bopoMap.put("le", -16171);
-			bopoMap.put("lei", -16169);
-			bopoMap.put("leng", -16158);
-			bopoMap.put("li", -16155);
-			bopoMap.put("lia", -15959);
-			bopoMap.put("lian", -15958);
-			bopoMap.put("liang", -15944);
-			bopoMap.put("liao", -15933);
-			bopoMap.put("lie", -15920);
-			bopoMap.put("lin", -15915);
-			bopoMap.put("ling", -15903);
-			bopoMap.put("liu", -15889);
-			bopoMap.put("long", -15878);
-			bopoMap.put("lou", -15707);
-			bopoMap.put("lu", -15701);
-			bopoMap.put("lv", -15681);
-			bopoMap.put("luan", -15667);
-			bopoMap.put("lue", -15661);
-			bopoMap.put("lun", -15659);
-			bopoMap.put("luo", -15652);
-			bopoMap.put("ma", -15640);
-			bopoMap.put("mai", -15631);
-			bopoMap.put("man", -15625);
-			bopoMap.put("mang", -15454);
-			bopoMap.put("mao", -15448);
-			bopoMap.put("me", -15436);
-			bopoMap.put("mei", -15435);
-			bopoMap.put("men", -15419);
-			bopoMap.put("meng", -15416);
-			bopoMap.put("mi", -15408);
-			bopoMap.put("mian", -15394);
-			bopoMap.put("miao", -15385);
-			bopoMap.put("mie", -15377);
-			bopoMap.put("min", -15375);
-			bopoMap.put("ming", -15369);
-			bopoMap.put("miu", -15363);
-			bopoMap.put("mo", -15362);
-			bopoMap.put("mou", -15183);
-			bopoMap.put("mu", -15180);
-			bopoMap.put("na", -15165);
-			bopoMap.put("nai", -15158);
-			bopoMap.put("nan", -15153);
-			bopoMap.put("nang", -15150);
-			bopoMap.put("nao", -15149);
-			bopoMap.put("ne", -15144);
-			bopoMap.put("nei", -15143);
-			bopoMap.put("nen", -15141);
-			bopoMap.put("neng", -15140);
-			bopoMap.put("ni", -15139);
-			bopoMap.put("nian", -15128);
-			bopoMap.put("niang", -15121);
-			bopoMap.put("niao", -15119);
-			bopoMap.put("nie", -15117);
-			bopoMap.put("nin", -15110);
-			bopoMap.put("ning", -15109);
-			bopoMap.put("niu", -14941);
-			bopoMap.put("nong", -14937);
-			bopoMap.put("nu", -14933);
-			bopoMap.put("nv", -14930);
-			bopoMap.put("nuan", -14929);
-			bopoMap.put("nue", -14928);
-			bopoMap.put("nuo", -14926);
-			bopoMap.put("o", -14922);
-			bopoMap.put("ou", -14921);
-			bopoMap.put("pa", -14914);
-			bopoMap.put("pai", -14908);
-			bopoMap.put("pan", -14902);
-			bopoMap.put("pang", -14894);
-			bopoMap.put("pao", -14889);
-			bopoMap.put("pei", -14882);
-			bopoMap.put("pen", -14873);
-			bopoMap.put("peng", -14871);
-			bopoMap.put("pi", -14857);
-			bopoMap.put("pian", -14678);
-			bopoMap.put("piao", -14674);
-			bopoMap.put("pie", -14670);
-			bopoMap.put("pin", -14668);
-			bopoMap.put("ping", -14663);
-			bopoMap.put("po", -14654);
-			bopoMap.put("pu", -14645);
-			bopoMap.put("qi", -14630);
-			bopoMap.put("qia", -14594);
-			bopoMap.put("qian", -14429);
-			bopoMap.put("qiang", -14407);
-			bopoMap.put("qiao", -14399);
-			bopoMap.put("qie", -14384);
-			bopoMap.put("qin", -14379);
-			bopoMap.put("qing", -14368);
-			bopoMap.put("qiong", -14355);
-			bopoMap.put("qiu", -14353);
-			bopoMap.put("qu", -14345);
-			bopoMap.put("quan", -14170);
-			bopoMap.put("que", -14159);
-			bopoMap.put("qun", -14151);
-			bopoMap.put("ran", -14149);
-			bopoMap.put("rang", -14145);
-			bopoMap.put("rao", -14140);
-			bopoMap.put("re", -14137);
-			bopoMap.put("ren", -14135);
-			bopoMap.put("reng", -14125);
-			bopoMap.put("ri", -14123);
-			bopoMap.put("rong", -14122);
-			bopoMap.put("rou", -14112);
-			bopoMap.put("ru", -14109);
-			bopoMap.put("ruan", -14099);
-			bopoMap.put("rui", -14097);
-			bopoMap.put("run", -14094);
-			bopoMap.put("ruo", -14092);
-			bopoMap.put("sa", -14090);
-			bopoMap.put("sai", -14087);
-			bopoMap.put("san", -14083);
-			bopoMap.put("sang", -13917);
-			bopoMap.put("sao", -13914);
-			bopoMap.put("se", -13910);
-			bopoMap.put("sen", -13907);
-			bopoMap.put("seng", -13906);
-			bopoMap.put("sha", -13905);
-			bopoMap.put("shai", -13896);
-			bopoMap.put("shan", -13894);
-			bopoMap.put("shang", -13878);
-			bopoMap.put("shao", -13870);
-			bopoMap.put("she", -13859);
-			bopoMap.put("shen", -13847);
-			bopoMap.put("sheng", -13831);
-			bopoMap.put("shi", -13658);
-			bopoMap.put("shou", -13611);
-			bopoMap.put("shu", -13601);
-			bopoMap.put("shua", -13406);
-			bopoMap.put("shuai", -13404);
-			bopoMap.put("shuan", -13400);
-			bopoMap.put("shuang", -13398);
-			bopoMap.put("shui", -13395);
-			bopoMap.put("shun", -13391);
-			bopoMap.put("shuo", -13387);
-			bopoMap.put("si", -13383);
-			bopoMap.put("song", -13367);
-			bopoMap.put("sou", -13359);
-			bopoMap.put("su", -13356);
-			bopoMap.put("suan", -13343);
-			bopoMap.put("sui", -13340);
-			bopoMap.put("sun", -13329);
-			bopoMap.put("suo", -13326);
-			bopoMap.put("ta", -13318);
-			bopoMap.put("tai", -13147);
-			bopoMap.put("tan", -13138);
-			bopoMap.put("tang", -13120);
-			bopoMap.put("tao", -13107);
-			bopoMap.put("te", -13096);
-			bopoMap.put("teng", -13095);
-			bopoMap.put("ti", -13091);
-			bopoMap.put("tian", -13076);
-			bopoMap.put("tiao", -13068);
-			bopoMap.put("tie", -13063);
-			bopoMap.put("ting", -13060);
-			bopoMap.put("tong", -12888);
-			bopoMap.put("tou", -12875);
-			bopoMap.put("tu", -12871);
-			bopoMap.put("tuan", -12860);
-			bopoMap.put("tui", -12858);
-			bopoMap.put("tun", -12852);
-			bopoMap.put("tuo", -12849);
-			bopoMap.put("wa", -12838);
-			bopoMap.put("wai", -12831);
-			bopoMap.put("wan", -12829);
-			bopoMap.put("wang", -12812);
-			bopoMap.put("wei", -12802);
-			bopoMap.put("wen", -12607);
-			bopoMap.put("weng", -12597);
-			bopoMap.put("wo", -12594);
-			bopoMap.put("wu", -12585);
-			bopoMap.put("xi", -12556);
-			bopoMap.put("xia", -12359);
-			bopoMap.put("xian", -12346);
-			bopoMap.put("xiang", -12320);
-			bopoMap.put("xiao", -12300);
-			bopoMap.put("xie", -12120);
-			bopoMap.put("xin", -12099);
-			bopoMap.put("xing", -12089);
-			bopoMap.put("xiong", -12074);
-			bopoMap.put("xiu", -12067);
-			bopoMap.put("xu", -12058);
-			bopoMap.put("xuan", -12039);
-			bopoMap.put("xue", -11867);
-			bopoMap.put("xun", -11861);
-			bopoMap.put("ya", -11847);
-			bopoMap.put("yan", -11831);
-			bopoMap.put("yang", -11798);
-			bopoMap.put("yao", -11781);
-			bopoMap.put("ye", -11604);
-			bopoMap.put("yi", -11589);
-			bopoMap.put("yin", -11536);
-			bopoMap.put("ying", -11358);
-			bopoMap.put("yo", -11340);
-			bopoMap.put("yong", -11339);
-			bopoMap.put("you", -11324);
-			bopoMap.put("yu", -11303);
-			bopoMap.put("yuan", -11097);
-			bopoMap.put("yue", -11077);
-			bopoMap.put("yun", -11067);
-			bopoMap.put("za", -11055);
-			bopoMap.put("zai", -11052);
-			bopoMap.put("zan", -11045);
-			bopoMap.put("zang", -11041);
-			bopoMap.put("zao", -11038);
-			bopoMap.put("ze", -11024);
-			bopoMap.put("zei", -11020);
-			bopoMap.put("zen", -11019);
-			bopoMap.put("zeng", -11018);
-			bopoMap.put("zha", -11014);
-			bopoMap.put("zhai", -10838);
-			bopoMap.put("zhan", -10832);
-			bopoMap.put("zhang", -10815);
-			bopoMap.put("zhao", -10800);
-			bopoMap.put("zhe", -10790);
-			bopoMap.put("zhen", -10780);
-			bopoMap.put("zheng", -10764);
-			bopoMap.put("zhi", -10587);
-			bopoMap.put("zhong", -10544);
-			bopoMap.put("zhou", -10533);
-			bopoMap.put("zhu", -10519);
-			bopoMap.put("zhua", -10331);
-			bopoMap.put("zhuai", -10329);
-			bopoMap.put("zhuan", -10328);
-			bopoMap.put("zhuang", -10322);
-			bopoMap.put("zhui", -10315);
-			bopoMap.put("zhun", -10309);
-			bopoMap.put("zhuo", -10307);
-			bopoMap.put("zi", -10296);
-			bopoMap.put("zong", -10281);
-			bopoMap.put("zou", -10274);
-			bopoMap.put("zu", -10270);
-			bopoMap.put("zuan", -10262);
-			bopoMap.put("zui", -10260);
-			bopoMap.put("zun", -10256);
-			bopoMap.put("zuo", -10254);
-			bopoMap.put("", -10246);
 			bopomofo = "";
 			String[] atoms = atomSplit(cstr);
 			for (String atom : atoms) {
 				if (isAllChinese(atom)) {
-					byte[] b = atom.getBytes();
+					byte[] b;
+					try {
+						b = atom.getBytes("GBK");
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+						b = atom.getBytes();
+					}
 					int id = (256 + b[0]) * 256 + (256 + b[1]) - 256 * 256;
 
 					int id1 = -20319;
@@ -2064,14 +2141,13 @@ public class GFString {
 			}
 
 			bopomofo = bopomofo.toUpperCase();
-
 		}
 
 		return bopomofo;
 	}
 
 	/**
-	 * °´×ÖµäË³Ğò¶ÔÁ½¸ö×Ö·û´®½øĞĞ±È½Ï
+	 * æŒ‰å­—å…¸é¡ºåºå¯¹ä¸¤ä¸ªå­—ç¬¦ä¸²è¿›è¡Œæ¯”è¾ƒ
 	 * 
 	 * @param s1
 	 * @param s2
@@ -2108,7 +2184,7 @@ public class GFString {
 	}
 
 	/**
-	 * ¸ù¾İIDºÅµÃµ½¶ÔÓ¦µÄGBºº×Ö
+	 * æ ¹æ®IDå·å¾—åˆ°å¯¹åº”çš„GBæ±‰å­—
 	 * 
 	 * @param id
 	 *            0--6767
@@ -2134,7 +2210,13 @@ public class GFString {
 		int result = -1;
 
 		if (s != null && s.length() == 1 && isAllChinese(s)) {
-			byte[] b = s.getBytes();
+			byte[] b;
+			try {
+				b = s.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				b = s.getBytes();
+			}
 			int high = b[0] + 256;
 			int low = b[1] + 256;
 
@@ -2147,7 +2229,13 @@ public class GFString {
 		int result = -1;
 
 		if (s != null && s.length() == 1) {
-			byte[] b = s.getBytes();
+			byte[] b;
+			try {
+				b = s.getBytes("GBK");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+				b = s.getBytes();
+			}
 			if (b.length == 2) {
 				int high = b[0] + 256;
 				int low = b[1] + 256;
@@ -2190,12 +2278,12 @@ public class GFString {
 	}
 
 	/**
-	 * µÃµ½¸Ã´ÊĞÔ¶ÔÓ¦µÄ´Ê
+	 * å¾—åˆ°è¯¥è¯æ€§å¯¹åº”çš„è¯
 	 * 
 	 * @param src
-	 *            Ô´×Ö·û´®
+	 *            æºå­—ç¬¦ä¸²
 	 * @param indexPos
-	 *            ´ÊĞÔ±ê¼ÇµÄÎ»ÖÃ
+	 *            è¯æ€§æ ‡è®°çš„ä½ç½®
 	 */
 	public static String getPosWord(String src, int indexPos) {
 		String result = null;
@@ -2219,7 +2307,7 @@ public class GFString {
  
 
 	/**
-	 * È¡µÃ×Ö·û´®ÖĞµÚÒ»´Î³öÏÖµÄÕûÊı
+	 * å–å¾—å­—ç¬¦ä¸²ä¸­ç¬¬ä¸€æ¬¡å‡ºç°çš„æ•´æ•°
 	 * 
 	 * @param str
 	 * @return
@@ -2246,10 +2334,10 @@ public class GFString {
 	}
 
 	/**
-	 * ×Ö·û´®µ±ÖĞÊÇ·ñº¬ÓĞÎŞ·¨ÏÔÊ¾µÄÂÒÂë
+	 * å­—ç¬¦ä¸²å½“ä¸­æ˜¯å¦å«æœ‰æ— æ³•æ˜¾ç¤ºçš„ä¹±ç 
 	 * 
-	 * GBK Òà²ÉÓÃË«×Ö½Ú±íÊ¾£¬×ÜÌå±àÂë·¶Î§Îª 8140-FEFE£¬Ê××Ö½ÚÔÚ 81-FE Ö®¼ä£¬Î²×Ö½ÚÔÚ 40-FE Ö®¼ä£¬ÌŞ³ı xx7F Ò»ÌõÏß¡£×Ü¼Æ
-	 * 23940 ¸öÂëÎ»£¬¹²ÊÕÈë 21886 ¸öºº×ÖºÍÍ¼ĞÎ·ûºÅ£¬ÆäÖĞºº×Ö£¨°üÀ¨²¿Ê×ºÍ¹¹¼ş£©21003 ¸ö£¬Í¼ĞÎ·ûºÅ 883 ¸ö¡£
+	 * GBK äº¦é‡‡ç”¨åŒå­—èŠ‚è¡¨ç¤ºï¼Œæ€»ä½“ç¼–ç èŒƒå›´ä¸º 8140-FEFEï¼Œé¦–å­—èŠ‚åœ¨ 81-FE ä¹‹é—´ï¼Œå°¾å­—èŠ‚åœ¨ 40-FE ä¹‹é—´ï¼Œå‰”é™¤ xx7F ä¸€æ¡çº¿ã€‚æ€»è®¡
+	 * 23940 ä¸ªç ä½ï¼Œå…±æ”¶å…¥ 21886 ä¸ªæ±‰å­—å’Œå›¾å½¢ç¬¦å·ï¼Œå…¶ä¸­æ±‰å­—ï¼ˆåŒ…æ‹¬éƒ¨é¦–å’Œæ„ä»¶ï¼‰21003 ä¸ªï¼Œå›¾å½¢ç¬¦å· 883 ä¸ªã€‚
 	 * 
 	 * @param msg
 	 * @return
@@ -2258,7 +2346,13 @@ public class GFString {
 		if (msg != null) {
 			String[] atoms = atomSplit(msg);
 			for (int i = 0; i < atoms.length; i++) {
-				byte[] bs = atoms[i].getBytes();
+				byte[] bs;
+				try {
+					bs = atoms[i].getBytes("GBK");
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					bs = atoms[i].getBytes();
+				}
 				if (bs.length == 1) {
 					if (bs[0] < 32 || bs[0] > 126)
 						return true;
@@ -2275,22 +2369,47 @@ public class GFString {
 	}
 
 	/**
-	 * ¸ñÊ½»¯Ê±¼ä³ÉÊ±·ÖÃëµÄĞÎÊ½
+	 * æ ¼å¼åŒ–æ—¶é—´æˆæ—¶åˆ†ç§’çš„å½¢å¼
 	 * 
 	 * @param millisTime
-	 *            ºÁÃëÊı
+	 *            æ¯«ç§’æ•°
 	 * @return
 	 */
 	public static String formatTime(long millisTime) {
 		StringBuffer sb = new StringBuffer();
 		millisTime = millisTime / 1000;
 		sb.append(millisTime / 3600);
-		sb.append("Ğ¡Ê±");
+		sb.append("å°æ—¶");
 		sb.append((millisTime % 3600) / 60);
-		sb.append("·ÖÖÓ");
+		sb.append("åˆ†é’Ÿ");
 		sb.append((millisTime % 3600) % 60);
-		sb.append("Ãë");
+		sb.append("ç§’");
 		return sb.toString();
 	}
- 
+	public static ArrayList<String> readTxtFile2(String fileName) throws IOException {
+		ArrayList<String> result = null;
+		FileInputStream fin = null;
+		InputStreamReader in = null;
+		BufferedReader br = null;
+		File file = null;
+		String value = null;
+
+		if (fileName != null) {
+			file = new File(fileName);
+			if (file.exists()) {
+				result = new ArrayList<String>();
+				try {
+					fin = new FileInputStream(file);
+					in = new InputStreamReader(fin);
+					br = new BufferedReader(in);
+					while ((value = br.readLine()) != null) {
+						result.add(value);
+					}
+				} catch (IOException e) {
+					throw new IOException();
+				}
+			}
+		}
+		return result;
+	}
 }

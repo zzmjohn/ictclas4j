@@ -3,18 +3,18 @@ package org.ictclas4j.bean;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 
 /**
- * ´ÊĞÔ±ê¼Ç
+ * è¯æ€§æ ‡è®°
  * 
  * @author sinboy
  * @since 2007.5.22
  * 
  */
 public class POS {
-	private int tag;// ´ÊĞÔ±ê¼Ç£¬Èç£ºnr£¬¸ß8Î»´ú±í´ÊĞÔµÄµÚÒ»¸ö×Ö·û£¬µÍ8Î»´ú±í´ÊµÄµÚ¶ş¸ö×Ö·û
+	private int tag;// è¯æ€§æ ‡è®°ï¼Œå¦‚ï¼šnrï¼Œé«˜8ä½ä»£è¡¨è¯æ€§çš„ç¬¬ä¸€ä¸ªå­—ç¬¦ï¼Œä½8ä½ä»£è¡¨è¯çš„ç¬¬äºŒä¸ªå­—ç¬¦
 
-	private double freq;// ¸Ã´ÊĞÔ³öÏÖµÄÆµÂÊ
+	private double freq;// è¯¥è¯æ€§å‡ºç°çš„é¢‘ç‡
 	
-	private int prev;//Ç°Ò»¸ö´ÊµÄN¸ö´ÊĞÔÖĞºÍ¸Ã´ÊĞÔ×îÆ¥ÅäµÄÄÇÒ»¸ö£¨ÏÂ±êÎ»ÖÃ£©
+	private int prev;//å‰ä¸€ä¸ªè¯çš„Nä¸ªè¯æ€§ä¸­å’Œè¯¥è¯æ€§æœ€åŒ¹é…çš„é‚£ä¸€ä¸ªï¼ˆä¸‹æ ‡ä½ç½®ï¼‰
 	
 	private boolean isBest;
 	

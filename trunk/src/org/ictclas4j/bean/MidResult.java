@@ -3,34 +3,34 @@ package org.ictclas4j.bean;
 import java.util.ArrayList;
 
 /**
- * ¼ÇÂ¼·Ö´ÊÊ±²úÉúµÄÖĞ¼ä½á¹û
+ * è®°å½•åˆ†è¯æ—¶äº§ç”Ÿçš„ä¸­é—´ç»“æœ
  * 
  * @author sinboy
  * @since 2007.5.24
  */
 public class MidResult {
-	private int index;// ¾ä×ÓµÄĞòÁĞ±àºÅ
+	private int index;// å¥å­çš„åºåˆ—ç¼–å·
 
-	private String source;// Ô´Êı¾İ
+	private String source;// æºæ•°æ®
 
-	private ArrayList<Atom> atoms;// Ô­×Ó·Ö´ÊµÄ½á¹û
+	private ArrayList<Atom> atoms;// åŸå­åˆ†è¯çš„ç»“æœ
 
-	private ArrayList<SegNode> segGraph;// ·Ö´ÊÍ¼±í
+	private ArrayList<SegNode> segGraph;// åˆ†è¯å›¾è¡¨
 
-	private ArrayList<SegNode> biSegGraph;// ¶ş²æ·Ö´ÊÍ¼±í
+	private ArrayList<SegNode> biSegGraph;// äºŒå‰åˆ†è¯å›¾è¡¨
 
-	private ArrayList<ArrayList<Integer>> bipath;// ¶ş²æ·Ö´ÊÂ·¾¶
+	private ArrayList<ArrayList<Integer>> bipath;// äºŒå‰åˆ†è¯è·¯å¾„
  
 
-	private ArrayList<String> firstResult;// ³õ´Î·Ö´Ê½á¹û
+	private ArrayList<String> firstResult;// åˆæ¬¡åˆ†è¯ç»“æœ
 
-	private ArrayList<SegNode> optSegGraph;// ÓÅ»¯ºóµÄ·Ö´ÊÍ¼±í
+	private ArrayList<SegNode> optSegGraph;// ä¼˜åŒ–åçš„åˆ†è¯å›¾è¡¨
 
-	private ArrayList<SegNode> optBiSegGraph;// ÓÅ»¯ºóµÄ¶ş²æ·Ö´ÊÍ¼±í
+	private ArrayList<SegNode> optBiSegGraph;// ä¼˜åŒ–åçš„äºŒå‰åˆ†è¯å›¾è¡¨
 
-	private ArrayList<ArrayList<Integer>> optBipath;// ÓÅ»¯ºóµÄ¶ş²æ·Ö´ÊÂ·¾¶
+	private ArrayList<ArrayList<Integer>> optBipath;// ä¼˜åŒ–åçš„äºŒå‰åˆ†è¯è·¯å¾„
 
-	private ArrayList<String> optResult;// ÓÅ»¯ºóµÄ·Ö´Ê½á¹û
+	private ArrayList<String> optResult;// ä¼˜åŒ–åçš„åˆ†è¯ç»“æœ
  
 
 	public void setIndex(int index) {
@@ -94,20 +94,20 @@ public class MidResult {
 	public String toHTML() {
 		StringBuffer html = new StringBuffer();
 		if (source != null) {
-			// ÏÔÊ¾·Ö´ÊÇ°µÄÔ­Ê¼ÄÚÈİ
-			html.append("<p>½øĞĞ¾ä×Ó·Ö¸îºóµÄ½á¹û£º");
+			// æ˜¾ç¤ºåˆ†è¯å‰çš„åŸå§‹å†…å®¹
+			html.append("<p>è¿›è¡Œå¥å­åˆ†å‰²åçš„ç»“æœï¼š");
 			html.append("<table border=\"1\" width=\"100%\">");
-			html.append("<tr><td width=\"10%\">µÚ" + index + "¾ä</td>");
+			html.append("<tr><td width=\"10%\">ç¬¬" + index + "å¥</td>");
 			html.append("<td width=\"90%\">" + source + "</td></tr></table>");
 
-			// ÏÔÊ¾¾­¹ıÔ­×Ó·Ö´ÊºóµÄ½á¹û
+			// æ˜¾ç¤ºç»è¿‡åŸå­åˆ†è¯åçš„ç»“æœ
 			if (atoms != null) {
-				html.append("<p>½øĞĞÔ­×Ó·Ö´ÊºóµÄ½á¹û£º");
+				html.append("<p>è¿›è¡ŒåŸå­åˆ†è¯åçš„ç»“æœï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
-				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">ĞòºÅ</td>");
-				html.append("<td width=\"40%\" bgcolor=\"#99CCFF\">Ô­×Ó</td>");
-				html.append("<td width=\"25%\" bgcolor=\"#99CCFF\">³¤¶È(×Ö½Ú)</td>");
+				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">åºå·</td>");
+				html.append("<td width=\"40%\" bgcolor=\"#99CCFF\">åŸå­</td>");
+				html.append("<td width=\"25%\" bgcolor=\"#99CCFF\">é•¿åº¦(å­—èŠ‚)</td>");
 				html.append("<td width=\"25%\" bgcolor=\"#99CCFF\">pos</td>");
 				html.append("</tr>");
 				for (int i = 0; i < atoms.size(); i++) {
@@ -122,9 +122,9 @@ public class MidResult {
 				html.append("</table>");
 			}
 
-			// ÏÔÊ¾³õ´ÎÉú³ÉµÄ·Ö´ÊÍ¼±í
+			// æ˜¾ç¤ºåˆæ¬¡ç”Ÿæˆçš„åˆ†è¯å›¾è¡¨
 			if (segGraph != null && segGraph.size() > 0) {
-				html.append("<p>³õ´ÎÉú³ÉµÄ·Ö´ÊÍ¼±í£º");
+				html.append("<p>åˆæ¬¡ç”Ÿæˆçš„åˆ†è¯å›¾è¡¨ï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
 				html.append("<td width=\"5%\"></td>");
@@ -155,9 +155,9 @@ public class MidResult {
 				html.append("</table>");
 			}
 
-			// ÏÔÊ¾³õ´ÎÉú³ÉµÄ¶ş²æ·Ö´ÊÍ¼±í
+			// æ˜¾ç¤ºåˆæ¬¡ç”Ÿæˆçš„äºŒå‰åˆ†è¯å›¾è¡¨
 			if (biSegGraph != null && biSegGraph.size() > 0) {
-				html.append("<p>³õ´ÎÉú³ÉµÄ¶ş²æ·Ö´ÊÍ¼±í£º");
+				html.append("<p>åˆæ¬¡ç”Ÿæˆçš„äºŒå‰åˆ†è¯å›¾è¡¨ï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
 				html.append("<td width=\"5%\"></td>");
@@ -188,13 +188,13 @@ public class MidResult {
 				html.append("</table>");
 			}
 
-			// ÏÔÊ¾Éú³ÉµÄ¶ş²æ·Ö´ÊÂ·¾¶
+			// æ˜¾ç¤ºç”Ÿæˆçš„äºŒå‰åˆ†è¯è·¯å¾„
 			if (bipath != null && bipath.size() > 0) {
-				html.append("<p>³õ´ÎÉú³ÉµÄ¶ş²æ·Ö´ÊÂ·¾¶£º");
+				html.append("<p>åˆæ¬¡ç”Ÿæˆçš„äºŒå‰åˆ†è¯è·¯å¾„ï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
-				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">ĞòºÅ</td>");
-				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">¶ş²æ·Ö´ÊÂ·¾¶</td>");
+				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">åºå·</td>");
+				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">äºŒå‰åˆ†è¯è·¯å¾„</td>");
 				html.append("</tr>");
 				for (int i = 0; i < bipath.size(); i++) {
 					html.append("<tr>");
@@ -210,13 +210,13 @@ public class MidResult {
 			}
  
 
-			// ÏÔÊ¾³õ´ÎÉú³ÉµÄ·Ö´Ê½á¹û
+			// æ˜¾ç¤ºåˆæ¬¡ç”Ÿæˆçš„åˆ†è¯ç»“æœ
 			if (firstResult != null && firstResult.size() > 0) {
-				html.append("<p>³õ´ÎÉú³ÉµÄ·Ö´Ê½á¹û£º");
+				html.append("<p>åˆæ¬¡ç”Ÿæˆçš„åˆ†è¯ç»“æœï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
-				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">ĞòºÅ</td>");
-				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">·Ö´Ê½á¹û</td>");
+				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">åºå·</td>");
+				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">åˆ†è¯ç»“æœ</td>");
 				html.append("</tr>");
 
 				for (int i=0;i< firstResult.size();i++) {
@@ -228,9 +228,9 @@ public class MidResult {
 				html.append("</table>");
 			}
 			
-			//ÏÔÊ¾¾­¹ıÈËÃû¡¢µØÃûÊ¶±ğºóµÄ´¦Àí½á¹û
+			//æ˜¾ç¤ºç»è¿‡äººåã€åœ°åè¯†åˆ«åçš„å¤„ç†ç»“æœ
 			if (optSegGraph != null && optSegGraph.size() > 0) {
-				html.append("<p>¾­¹ıÈËÃû¡¢µØÃûÊ¶±ğºóµÄ·Ö´ÊÍ¼±í£º");
+				html.append("<p>ç»è¿‡äººåã€åœ°åè¯†åˆ«åçš„åˆ†è¯å›¾è¡¨ï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
 				html.append("<td width=\"5%\"></td>");
@@ -261,9 +261,9 @@ public class MidResult {
 				html.append("</table>");
 			}
 			
-			//ÏÔÊ¾½á¹ıÓÅ»¯ºóµÄ¶ş²æ·Ö´ÊÂ·¾¶ 
+			//æ˜¾ç¤ºç»“è¿‡ä¼˜åŒ–åçš„äºŒå‰åˆ†è¯è·¯å¾„ 
 			if (optBiSegGraph != null && optBiSegGraph.size() > 0) {
-				html.append("<p>¾­¹ıÓÅ»¯ºóµÄ¶ş²æ·Ö´ÊÍ¼±í£º");
+				html.append("<p>ç»è¿‡ä¼˜åŒ–åçš„äºŒå‰åˆ†è¯å›¾è¡¨ï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
 				html.append("<td width=\"5%\"></td>");
@@ -294,13 +294,13 @@ public class MidResult {
 				html.append("</table>");
 			}
 			
-			//½áÕâÓÅ»¯ºóµÄ¶ş²æ·Ö´ÊÂ·¾¶
+			//ç»“è¿™ä¼˜åŒ–åçš„äºŒå‰åˆ†è¯è·¯å¾„
 			if (optBipath != null && optBipath.size() > 0) {
-				html.append("<p>¾­¹ıÓÅ»¯ºóµÄ¶ş²æ·Ö´ÊÂ·¾¶£º");
+				html.append("<p>ç»è¿‡ä¼˜åŒ–åçš„äºŒå‰åˆ†è¯è·¯å¾„ï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
-				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">ĞòºÅ</td>");
-				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">¶ş²æ·Ö´ÊÂ·¾¶</td>");
+				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">åºå·</td>");
+				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">äºŒå‰åˆ†è¯è·¯å¾„</td>");
 				html.append("</tr>");
 				for (int i = 0; i < optBipath.size(); i++) {
 					html.append("<tr>");
@@ -314,13 +314,13 @@ public class MidResult {
 				}
 				html.append("</table>");
 			}
-			//ÏÔÊ¾¾­¹ıÓÅ»¯ºóµÄ·Ö´Ê½á¹û
+			//æ˜¾ç¤ºç»è¿‡ä¼˜åŒ–åçš„åˆ†è¯ç»“æœ
 			if (optResult != null && optResult.size() > 0) {
-				html.append("<p>¾­¹ıÓÅ»¯ºóµÄ·Ö´Ê½á¹û£º");
+				html.append("<p>ç»è¿‡ä¼˜åŒ–åçš„åˆ†è¯ç»“æœï¼š");
 				html.append("<table border=\"1\" width=\"100%\">");
 				html.append("<tr>");
-				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">ĞòºÅ</td>");
-				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">·Ö´Ê½á¹û</td>");
+				html.append("<td width=\"10%\" bgcolor=\"#99CCFF\">åºå·</td>");
+				html.append("<td width=\"90%\" bgcolor=\"#99CCFF\">åˆ†è¯ç»“æœ</td>");
 				html.append("</tr>");
 
 				for (int i=0;i< optResult.size();i++) {
@@ -332,7 +332,7 @@ public class MidResult {
 				html.append("</table>");
 			}
 			
-			//ÏÔÊ¾×îÖÕµÄ·Ö´Ê½á¹û
+			//æ˜¾ç¤ºæœ€ç»ˆçš„åˆ†è¯ç»“æœ
 		}
 		return html == null ? null : html.toString();
 	}

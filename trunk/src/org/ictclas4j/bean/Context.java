@@ -1,7 +1,7 @@
 package org.ictclas4j.bean;
 
 public class Context {
-	//¹Ø¼ü´Ê
+	//å…³é”®è¯
 	private int key; 
 
 	private int[][] contextArray;// The context array

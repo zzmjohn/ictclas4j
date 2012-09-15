@@ -1,5 +1,6 @@
 package org.ictclas4j.bean;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import org.ictclas4j.utility.Utility;
@@ -79,7 +80,7 @@ public class Span {
 				while (m_nBestTag[j] != -1 && j < m_nCurLength) {
 					WordResult wr = wrList.get(j + nStartPos - 1);
 					wr.setHandle(m_nBestTag[j]);
-					// Let ¡£be 0
+					// Let ã€‚be 0
 					// Exist and update its frequncy as a POS value
 					if (wr.getValue() > 0 && coreDict.isExist(wr.getWord(), -1))
 						wr.setValue(coreDict.getFreq(wr.getWord(), m_nBestTag[j]));
@@ -177,7 +178,7 @@ public class Span {
 	}
 
 	/**
-	 * È¡µÃÃ»ÓĞÔÚdictUnknownÖĞ³öÏÖ¹ıµÄ´ÊµÄÏÂÒ»¸öÎ»ÖÃ
+	 * å–å¾—æ²¡æœ‰åœ¨dictUnknownä¸­å‡ºç°è¿‡çš„è¯çš„ä¸‹ä¸€ä¸ªä½ç½®
 	 * @param wrList
 	 * @param index
 	 * @param coreDict
@@ -200,7 +201,12 @@ public class Span {
 			if (tagType == Utility.TAG_TYPE.TT_NORMAL || !unknownDict.isExist(word, 44)) {
 				// current word
 				m_sWords[i] = word;// store
-				m_nWordPosition[i + 1] = m_nWordPosition[i] + m_sWords[i].getBytes().length;
+				try {
+					m_nWordPosition[i + 1] = m_nWordPosition[i] + m_sWords[i].getBytes("GBK").length;
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					this.m_nWordPosition[(i + 1)] = (this.m_nWordPosition[i] + this.m_sWords[i].getBytes().length);
+				}
 			}  
 			
 			// Record the position of current word
@@ -212,9 +218,9 @@ public class Span {
 				if (tagType == Utility.TAG_TYPE.TT_TRANS_PERSON && i > 0
 						&& Utility.charType(m_sWords[i - 1]) == Utility.CT_CHINESE) {
 					if (".".equals(m_sWords[i]))
-						sCurWord = "£®";
+						sCurWord = "ï¼";
 					else if ("-".equals(m_sWords))
-						sCurWord = "£­";
+						sCurWord = "ï¼";
 				}
 				ArrayList<WordItem> wis = unknownDict.getHandle(sCurWord);
 				nPOSCount = wis.size() + 1;
@@ -226,11 +232,11 @@ public class Span {
 					m_dFrequency[i][j] += Math.log((context.getFreq(0, aPOS[j]) + nPOSCount));
 				}
 
-				if ("Ê¼##Ê¼".equals(m_sWords[i])) {
+				if ("å§‹##å§‹".equals(m_sWords[i])) {
 					m_nTags[i][j] = 100;
 					m_dFrequency[i][j] = 0;
 					j++;
-				} else if ("Ä©##Ä©".equals(m_sWords[i])) {
+				} else if ("æœ«##æœ«".equals(m_sWords[i])) {
 					m_nTags[i][j] = 101;
 					m_dFrequency[i][j] = 0;
 					j++;
@@ -306,7 +312,7 @@ public class Span {
 			nRetPos = -1;// Reaching ending
 
 		if (m_nTags[i - 1][1] != -1)// ||m_sWords[i][0]==0
-		{// Set end for words like "ÕÅ/»ª/Æ½"
+		{// Set end for words like "å¼ /å/å¹³"
 			if (tagType != Utility.TAG_TYPE.TT_NORMAL)
 				m_nTags[i][0] = 101;
 			else
@@ -343,21 +349,21 @@ public class Span {
 	 *          XD 926 0.009735
 	 *          
 	 *          The person recognition patterns set
-	 *          BBCD:ĞÕ+ĞÕ+Ãû1+Ãû2;
-	 *          BBE: ĞÕ+ĞÕ+µ¥Ãû;
-	 *          BBZ: ĞÕ+ĞÕ+Ë«Ãû³É´Ê;
-	 *          BCD: ĞÕ+Ãû1+Ãû2;
-	 *          BE: ĞÕ+µ¥Ãû;
-	 *          BEE: ĞÕ+µ¥Ãû+µ¥Ãû;º«ÀÚÀÚ
-	 *          BG: ĞÕ+ºó×º
-	 *          BXD: ĞÕ+ĞÕË«ÃûÊ××Ö³É´Ê+Ë«ÃûÄ©×Ö
-	 *          BZ: ĞÕ+Ë«Ãû³É´Ê;
-	 *          B: ĞÕ
-	 *          CD: Ãû1+Ãû2;
-	 *          EE: µ¥Ãû+µ¥Ãû;
-	 *          FB: Ç°×º+ĞÕ
-	 *          XD: ĞÕË«ÃûÊ××Ö³É´Ê+Ë«ÃûÄ©×Ö
-	 *          Y: ĞÕµ¥Ãû³É´Ê
+	 *          BBCD:å§“+å§“+å1+å2;
+	 *          BBE: å§“+å§“+å•å;
+	 *          BBZ: å§“+å§“+åŒåæˆè¯;
+	 *          BCD: å§“+å1+å2;
+	 *          BE: å§“+å•å;
+	 *          BEE: å§“+å•å+å•å;éŸ©ç£Šç£Š
+	 *          BG: å§“+åç¼€
+	 *          BXD: å§“+å§“åŒåé¦–å­—æˆè¯+åŒåæœ«å­—
+	 *          BZ: å§“+åŒåæˆè¯;
+	 *          B: å§“
+	 *          CD: å1+å2;
+	 *          EE: å•å+å•å;
+	 *          FB: å‰ç¼€+å§“
+	 *          XD: å§“åŒåé¦–å­—æˆè¯+åŒåæœ«å­—
+	 *          Y: å§“å•åæˆè¯
 	 * </pre>
 	 */
 	public boolean PersonRecognize(Dictionary personDict) {
@@ -385,14 +391,14 @@ public class Span {
 		while (j < i) {
 			bMatched = false;
 			for (k = 0; !bMatched && patternLen[k] > 0; k++) {
-				if (sPOS.substring(j).indexOf(patterns[k]) == 0 && !"¡¤".equals(m_sWords[j - 1])
-						&& !"¡¤".equals(m_sWords[j + patternLen[k]])) {// Find
+				if (sPOS.substring(j).indexOf(patterns[k]) == 0 && !"Â·".equals(m_sWords[j - 1])
+						&& !"Â·".equals(m_sWords[j + patternLen[k]])) {// Find
 
 					String temp = sPOS.substring(j + 2);
 					if (temp.length() > 1)
 						temp = temp.substring(0, 1);
 
-					// Rule 1 for exclusion:Ç°×º+ĞÕ+Ãû1(Ãû2): ¹æÔò(Ç°×º+ĞÕ)Ê§Ğ§£»
+					// Rule 1 for exclusion:å‰ç¼€+å§“+å1(å2): è§„åˆ™(å‰ç¼€+å§“)å¤±æ•ˆï¼›
 					if ("FB".equals(patterns[k]) && ("E".equals(temp) || "C".equals(temp) || "G".equals(temp))) {
 						continue;
 					}
@@ -440,13 +446,18 @@ public class Span {
 			break;
 		case TT_PERSON:
 			j = 0;
-			if (m_sWords[index].indexOf("¡Á¡Á") != -1) {
+			if (m_sWords[index].indexOf("Ã—Ã—") != -1) {
 				m_nTags[i][j] = 6;
 				m_dFrequency[i][j++] = (double) 1 / (double) (context.getFreq(0, 6) + 1);
 			} else {
 				m_nTags[i][j] = 0;
 				m_dFrequency[i][j++] = (double) 1 / (double) (context.getFreq(0, 0) + 1);
-				nLen = m_sWords[index].getBytes().length;
+				try {
+					nLen = m_sWords[index].getBytes("GBK").length;
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					nLen = m_sWords[index].getBytes().length;
+				}
 				if (nLen >= 4) {
 					m_nTags[i][j] = 0;
 					m_dFrequency[i][j++] = (double) 1 / (double) (context.getFreq(0, 0) + 1);

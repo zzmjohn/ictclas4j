@@ -2,7 +2,7 @@ package org.ictclas4j.segment;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.ictclas4j.bean.Queue;
 import org.ictclas4j.bean.QueueNode;
 import org.ictclas4j.bean.SegNode;
@@ -10,28 +10,28 @@ import org.ictclas4j.utility.Utility;
 
 
 /**
- * N-×î¶ÌÂ·¾¶
+ * N-æœ€çŸ­è·¯å¾„
  * 
  * @author sinboy
  * @since 2007.5.17 updated
  */
 public class NShortPath {
-	// ×î¶ÌÂ·¾¶µÄÊıÄ¿
+	// æœ€çŸ­è·¯å¾„çš„æ•°ç›®
 	private int pathCount;
 
-	// ¶ş²æ·Ö´ÊÍ¼±í
+	// äºŒå‰åˆ†è¯å›¾è¡¨
 	private SegGraph biSegGraph;
 
-	// Ã¿ÌõÂ·¾¶¶ÔÓ¦µÄÈ¨Öµ
+	// æ¯æ¡è·¯å¾„å¯¹åº”çš„æƒå€¼
 	private double[][] pathWeight;
 
-	// ¼ÇÂ¼µ±Ç°½ÚµãµÄN¸ö¸¸Ç×µã¼°ÆäÈ¨ÖØ
+	// è®°å½•å½“å‰èŠ‚ç‚¹çš„Nä¸ªçˆ¶äº²ç‚¹åŠå…¶æƒé‡
 	private Queue[] parent;
 
-	// ·Ö´ÊÍ¼±íÖĞ¶¥µã¸öÊı
+	// åˆ†è¯å›¾è¡¨ä¸­é¡¶ç‚¹ä¸ªæ•°
 	private int vertex;
 
-	Logger logger = Logger.getLogger(NShortPath.class);
+	//Logger logger = Logger.getLogger(NShortPath.class);
 
 	public NShortPath(SegGraph bsg, int pathCount) {
 		this.biSegGraph = bsg;
@@ -55,7 +55,7 @@ public class NShortPath {
 	}
 
 	/**
-	 * °´ÁĞ±éÀúÍ¼±í£¬²¢°ÑÃ¿Ò»ÁĞÖĞÈ¨ÖØ×îĞ¡µÄÈ¡³öÀ´¡£
+	 * æŒ‰åˆ—éå†å›¾è¡¨ï¼Œå¹¶æŠŠæ¯ä¸€åˆ—ä¸­æƒé‡æœ€å°çš„å–å‡ºæ¥ã€‚
 	 * 
 	 */
 	private void shortPath() {
@@ -63,9 +63,9 @@ public class NShortPath {
 		double weight = 0;
 
 		if (biSegGraph != null) {
-			// Í¼±íµÄÁĞÖµÊÇ´Ó1¿ªÊ¼,ËùÒÔºöÂÔµôµÚ0ÁĞ
+			// å›¾è¡¨çš„åˆ—å€¼æ˜¯ä»1å¼€å§‹,æ‰€ä»¥å¿½ç•¥æ‰ç¬¬0åˆ—
 			for (int cur = 1; cur < vertex; cur++) {
-				// µÃµ½Í¬Ò»ÁĞµÄËùÓĞÔªËØ
+				// å¾—åˆ°åŒä¸€åˆ—çš„æ‰€æœ‰å…ƒç´ 
 				ArrayList<SegNode> colSgs = biSegGraph.getNodes(cur, true);
 				if (colSgs == null || colSgs.size() == 0)
 					return;
@@ -85,14 +85,14 @@ public class NShortPath {
 
 				}
 
-				// ¼ÇÂ¼Ã¿Ò»¸ö½ÚµãµÄN¸öÇ°Çı¼°È¨ÖØ
+				// è®°å½•æ¯ä¸€ä¸ªèŠ‚ç‚¹çš„Nä¸ªå‰é©±åŠæƒé‡
 				QueueNode minNode = null;
 				int pathIndex = 0;
 				while ((minNode = queWork.pop()) != null && pathIndex < pathCount) {
 					pathWeight[cur][pathIndex] = minNode.getWeight();
 					parent[cur].push(minNode);
-					logger.debug("pathWeight[" + cur + "][" + pathIndex + "]:" + pathWeight[cur][pathIndex]);
-					logger.debug("parent[" + cur + "]:" + parent[cur]);
+					//logger.debug("pathWeight[" + cur + "][" + pathIndex + "]:" + pathWeight[cur][pathIndex]);
+					//logger.debug("parent[" + cur + "]:" + parent[cur]);
 					pathIndex++;
 				}
 			}
@@ -101,7 +101,7 @@ public class NShortPath {
 
 	public ArrayList<ArrayList<Integer>> getPaths() {
 		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
-		ArrayList<Integer> onePath = null;// Ò»Ìõ·Ö´ÊÂ·¾¶
+		ArrayList<Integer> onePath = null;// ä¸€æ¡åˆ†è¯è·¯å¾„
 
 		Queue queResult = null;
 		int curNode, curIndex = 0;
@@ -130,7 +130,7 @@ public class NShortPath {
 				}
 
 				if (curNode == 0) {
-					// Êä³öÒ»Ìõ·Ö´ÊÂ·¾¶
+					// è¾“å‡ºä¸€æ¡åˆ†è¯è·¯å¾„
 					QueueNode qn = null;
 					onePath = new ArrayList<Integer>();
 					onePath.add(curNode);
@@ -138,11 +138,11 @@ public class NShortPath {
 						onePath.add(qn.getParent());
 					result.add(onePath);
 					queResult.resetIndex();
-					pathIndex++;// Ñ°ÕÒÏÂÒ»Ìõ´Î¶ÌÂ·¾¶
+					pathIndex++;// å¯»æ‰¾ä¸‹ä¸€æ¡æ¬¡çŸ­è·¯å¾„
 					if (pathIndex == pathCount)
 						break;
 
-					// Èç¹ûÕÒµ½ÓĞÏÂÒ»¸öÇ°ÇıµÄ½Úµã£¬Ôò°ÑËüµÄÕâ¸öÇ°ÇıÑ¹ÈëÕ»ÖĞ
+					// å¦‚æœæ‰¾åˆ°æœ‰ä¸‹ä¸€ä¸ªå‰é©±çš„èŠ‚ç‚¹ï¼Œåˆ™æŠŠå®ƒçš„è¿™ä¸ªå‰é©±å‹å…¥æ ˆä¸­
 					while ((qn = queResult.pop()) != null) {
 						curNode = qn.getParent();
 						QueueNode next = parent[curNode].pop(false);
@@ -181,7 +181,7 @@ public class NShortPath {
 				for (int j : paths.get(i)) {
 					result += j + ",";
 				}
-				logger.info(result);
+				//logger.info(result);
 			}
 		}
 	}
