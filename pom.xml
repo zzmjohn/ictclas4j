@@ -10,7 +10,7 @@
 	<artifactId>ictclas4j</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
 	<name>ictclas4j</name>
-	<description>Word segementation system for Chinese.</description>
+	<description>Word segmentation system for Chinese.</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
