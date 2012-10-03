@@ -116,6 +116,9 @@ public class NShortPath {
 			curIndex = 0;
 
 			while (!queResult.isEmpty()) {
+				// Hacky unfix to avoid endless loop.
+				// See: http://code.google.com/p/ictclas4j/issues/detail?id=13 
+				int endlessLoopPrevent = 0; // ISSUE 13 HACK
 				while (curNode > 0) {
 					// Get its parent and store them in nParentNode,nParentIndex
 					QueueNode qn = parent[curNode].pop(false);
@@ -125,6 +128,15 @@ public class NShortPath {
 						curNode = qn.getParent();
 						curIndex = qn.getIndex();
 					}
+					
+					// BEGIN ISSUE 13 HACK
+					if (endlessLoopPrevent++ > 1000) {
+						throw new IllegalStateException("Internal error: loop in getPaths() might " +
+								"never stop, thus throwing exception. Loop count: "
+								+ endlessLoopPrevent);
+					}
+					// END ISSUE 13 HACK
+					
 					if (curNode > 0)
 						queResult.push(new QueueNode(curNode, curIndex, 0));
 				}
